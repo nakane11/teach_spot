@@ -6,7 +6,7 @@ from geometry_msgs.msg import Point
 from geometry_msgs.msg import Quaternion
 from geometry_msgs.msg import Vector3
 from jsk_recognition_msgs.msg import BoundingBox, BoundingBoxArray
-from hand_navigation_pr2.srv import SetBBoxPublisher, SetBBoxPublisherResponse
+from teach_spot.srv import SetBBoxPublisher, SetBBoxPublisherResponse
 import rospy
 
 class BoundingBoxPublisher(object):
