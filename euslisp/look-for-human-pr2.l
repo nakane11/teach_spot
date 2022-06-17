@@ -39,7 +39,7 @@
     nil))
           
 (defun set-bbox ()
-  (let ((bbox_req (instance hand_navigation_pr2::SetBBoxPublisherRequest :init))
+  (let ((bbox_req (instance teach_spot::SetBBoxPublisherRequest :init))
         position human-footprint footprint (width 0.6))
     (setq position (get-people))
     (if position
