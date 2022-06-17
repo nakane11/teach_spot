@@ -1,5 +1,5 @@
 (ros::roseus-add-msgs "geometry_msgs")
-(ros::roseus-add-srvs "hand_navigation_pr2")
+(ros::roseus-add-srvs "teach_spot")
 (ros::roseus-add-srvs "std_srvs")
 
 (ros::roseus "look_for_human")
