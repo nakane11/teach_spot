@@ -119,7 +119,7 @@
              (dolist (i (set-difference (send spot-graph :nodes)
                                         (if (null prev-n)
                                             nil
-                                            (mapcar #'(lambda (n) (cadr n)) (send prev-n :successors)))))
+                                            (mapcar #'(lambda (n) (cdr n)) (send prev-n :successors)))))
                (unless (string= (send i :name) (send prev-n :name))
                  (let ((diff (abs (coords-difference spot-coords (send i :get :coords)))))
                    (when  (< diff 0.40)
