@@ -4,13 +4,15 @@
   <!-- <arg name="input_cloud" value="/kinect_head/depth_registered/points" /> -->
   <!-- <arg name="input_cloud" value="/kinect_head/depth_registered/quater/points" /> -->
   <arg name="input_base_scan" value="/base_scan" />
-  <!-- <arg name="input_tilt_scan" value="/tilt_scan_filtered/navigation" /> -->
   <arg name="manager_name" default="hand_navigation_pr2_manager" />
   <arg name="manager" default="/$(arg manager_name)" />
 
   <node name="$(arg manager_name)"
         pkg="nodelet" type="nodelet"
         args="manager"/>
+
+  <node name="set_params"
+        pkg="teach_spot" type="set_params_fetch.py"/>
 
   <node name="boundingbox_publisher"
         pkg="teach_spot" type="boundingbox_publisher.py">
