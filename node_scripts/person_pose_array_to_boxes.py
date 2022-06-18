@@ -26,7 +26,7 @@ class PersonPoseArrayToBoxes(ConnectionBasedTransport):
         self.pub = self.advertise('~output', BoundingBoxArray, queue_size=1)
 
     def subscribe(self):
-        self.sub = rospy.Subscriber('/dr_spaam_lidar_person_detection/output', PoseArray, self._cb)
+        self.sub = rospy.Subscriber('~input', PoseArray, self._cb)
 
     def unsubscribe(self):
         self.sub.unregister()

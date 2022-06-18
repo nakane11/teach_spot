@@ -1,15 +1,17 @@
 <launch>
   <env name="ROSCONSOLE_FORMAT" value="[${severity}][${thread}][${node}/${function}:${line}]: ${message}"/>
   <arg name="gui" default="true" />
-  <arg name="pull_arm" default="false" />
-  <arg name="look" default="false" />
+  <arg name="larm" default="true" />
+  <arg name="pull_arm" default="true" />
+  <arg name="look" default="true" />
+  <arg name="safe" default="true" />
   
   <arg name="addpose_topic" default="/follow_waypoints/initialpose"/>
   <arg name="posearray_topic" default="/waypoints"/>
   
-  <arg name="input_camera_info" value="/kinect_head/rgb/camera_info" />
-  <arg name="input_depth_image" value="/kinect_head/depth_registered/hw_registered/image_rect" />
-  <arg name="input_pose_array" value="/edgetpu_human_pose_estimator/output/poses" />
+
+  <arg if="$(arg larm)" name="arm" value="larm" />
+  <arg unless="$(arg larm)" name="arm" value="rarm" />
 
   <include file="$(find teach_spot)/launch/speech_recognition.launch" >
     <arg name="language" default="ja-JP" />
@@ -23,46 +25,16 @@
   
   <group if="$(arg pull_arm)" >
     <include file="$(find virtual_force_drag)/launch/pr2_virtual_force_drag.launch" >
-      <arg name="gui" default="false" />
+      <arg name="larm" value="$(arg larm)" />
+      <arg name="look" value="$(arg look)" />
+      <arg name="safe" value="$(arg safe)" />
     </include>
   </group>
 
-  <group if="$(arg look)" >
-    <node name="people_pose_2d_to_3d"
-          pkg="jsk_perception" type="people_pose_2d_to_3d.py"
-          output="screen">
-      <remap from="~input/pose" to="$(arg input_pose_array)" />
-      <remap from="~input/info" to="$(arg input_camera_info)" />
-      <remap from="~input/depth" to="$(arg input_depth_image)" />
-      <rosparam subst_value="true">
-        approximate_sync: true
-        queue_size: 100
-      </rosparam>
-    </node>
-
-    <node name="people_pose_array_accumulator"
-          pkg="teach_spot" type="people_pose_array_accumulator.py"
-          output="screen">
-      <remap from="~input" to="people_pose_2d_to_3d/output/pose" />
-      <param name="base_frame_id" value="base_footprint"/>
-    </node>
-
-    <node pkg="roseus" type="roseus" name="look_for_human" output="screen"
-          args="$(find teach_spot)/euslisp/look-for-human-pr2.l" >
-      <param name="robot" value="pr2"/>
-      <param name="pull_arm" value="$(arg pull_arm)"/>
-      <rosparam>
-        footprint_ns:
-        - /move_base_node/global_costmap
-        - /move_base_node/local_costmap
-        - /safe_teleop_base/local_costmap
-      </rosparam>
-    </node>
-
-    <include file="$(find teach_spot)/launch/human_filter_pr2.launch" >
-      <arg name="gui" value="false" />
-    </include>
-  </group>
+  <include file="$(find teach_spot)/launch/human_filter_pr2.launch" >
+    <arg name="gui" value="false" />
+    <arg name="arm" value="$(arg arm)" />
+  </include>
   
   <node pkg="follow_waypoints" type="follow_waypoints_server" name="follow_waypoints" output="screen" clear_params="true">
     <param name="base_frame_id" value="base_footprint"/>

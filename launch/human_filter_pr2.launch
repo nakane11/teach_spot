@@ -1,6 +1,7 @@
 <launch>
   
   <arg name="gui" default="false" />
+  <arg name="arm" default="larm" />
   <!-- <arg name="input_cloud" value="/kinect_head/depth_registered/points" /> -->
   <!-- <arg name="input_cloud" value="/kinect_head/depth_registered/quater/points" /> -->
   <arg name="input_base_scan" value="/base_scan_filtered" />
@@ -12,11 +13,17 @@
         pkg="nodelet" type="nodelet"
         args="manager"/>
 
-  <node name="boundingbox_publisher"
-        pkg="teach_spot" type="boundingbox_publisher.py">
+  <node name="set_params"
+        pkg="teach_spot" type="set_params_pr2.py"/>
+
+  <include file="$(find jsk_perception)/sample/sample_lidar_person_detection.launch" />
+
+  <node name="person_pose_array_to_boxes"
+        pkg="teach_spot" type="person_pose_array_to_boxes.py">
+    <remap from="~input" to="/dr_spaam_lidar_person_detection/output" />
     <rosparam>
+      target_arm: $(arg arm)
       base_frame_id: base_link
-      on_ground: true
     </rosparam>
   </node>
 
