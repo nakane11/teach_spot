@@ -50,7 +50,7 @@ class PersonPoseArrayToBoxes(ConnectionBasedTransport):
             x, y, z = person.position.x, person.position.y, person.position.z
             x, y, z = pykdl_transform_base_to_laser * PyKDL.Vector(
                 x, y, z)
-            if y * (1 if self._arm == "larm" else -1) < 0: 
+            if y * (1 if self._arm == "larm" else -1) > 0:
                 continue
             if np.sqrt(x ** 2 + y ** 2) > 0.65:
                 continue
