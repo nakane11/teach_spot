@@ -1,45 +1,46 @@
 #!/usr/bin/env python
 import rospy
+import rosnode
 import dynamic_reconfigure.client
 
 class SetParams():
 
     def __init__(self):
+        self.params = ["/move_base_node/global_costmap/obstacle_layer/base_scan_filtered/topic",
+                       "/move_base_node/local_costmap/obstacle_layer/base_scan_filtered/topic",
+                       "/safe_teleop_base/local_costmap/obstacle_layer/base_scan_filtered/topic",
+                       "/move_base_node/global_costmap/obstacle_layer/tilt_scan_filtered/topic",
+                       "/move_base_node/local_costmap/obstacle_layer/tilt_scan_filtered/topic",
+                       "/safe_teleop_base/local_costmap/obstacle_layer/tilt_scan_filtered/topic"]
+        self.mux_topics = ["/base_scan_mux", "/base_scan_mux", "/base_scan_mux",
+                       "/tilt_scan_mux", "/tilt_scan_mux", "/tilt_scan_mux"]
         rospy.on_shutdown(self.restore_params)
         self.store_params()
         self.clients = [dynamic_reconfigure.client.Client("/move_base_node/global_costmap/"),
                         dynamic_reconfigure.client.Client("/move_base_node/local_costmap/"),
                         dynamic_reconfigure.client.Client("/safe_teleop_base/local_costmap/")]
-        # self.set_params()
+        self.set_params()
         
     def store_params(self):
-        # self.move_base_node_global_costmap_base_scan = rospy.get_param("/move_base_node/global_costmap/obstacle_layer/base_scan_filtered/topic")
-        # self.move_base_node_local_costmap_base_scan = rospy.get_param("/move_base_node/local_costmap/obstacle_layer/base_scan_filtered/topic")
-        # self.safe_teleop_base_local_costmap_base_scan = rospy.get_param("/safe_teleop_base/local_costmap/obstacle_layer/base_scan_filtered/topic")
-        # self.move_base_node_global_costmap_tilt_scan = rospy.get_param("/move_base_node/global_costmap/obstacle_layer/tilt_scan_filtered/topic")
-        # self.move_base_node_local_costmap_tilt_scan = rospy.get_param("/move_base_node/local_costmap/obstacle_layer/tilt_scan_filtered/topic")
-        # self.safe_teleop_base_local_costmap_tilt_scan = rospy.get_param("/safe_teleop_base/local_costmap/obstacle_layer/tilt_scan_filtered/topic")
+        self.move_base_topics = []
+        for param in self.params:
+            self.move_base_topics.append(rospy.get_param(param))
+
         self.footprints = [rospy.get_param("/move_base_node/global_costmap/footprint"),
                            rospy.get_param("/move_base_node/local_costmap/footprint"),
                            rospy.get_param("/safe_teleop_base/local_costmap/footprint")]    
 
     def set_params(self):
-        rospy.set_param("/move_base_node/global_costmap/obstacle_layer/base_scan_filtered/topic", "/base_scan_mux")
-        rospy.set_param("/move_base_node/local_costmap/obstacle_layer/base_scan_filtered/topic", "/base_scan_mux")
-        rospy.set_param("/safe_teleop_base/local_costmap/obstacle_layer/base_scan_filtered/topic", "/base_scan_mux")
-        rospy.set_param("/move_base_node/global_costmap/obstacle_layer/tilt_scan_filtered/topic", "/tilt_scan_mux")
-        rospy.set_param("/move_base_node/local_costmap/obstacle_layer/tilt_scan_filtered/topic", "/tilt_scan_mux")
-        rospy.set_param("/safe_teleop_base/local_costmap/obstacle_layer/tilt_scan_filtered/topic", "/tilt_scan_mux")
-    
+        for param, topic in zip(self.params, self.mux_topics):
+            rospy.set_param(param, topic)
+        rosnode.kill_nodes(["/move_base_node"])
+        
     def restore_params(self):
-        # rospy.set_param("/move_base_node/global_costmap/obstacle_layer/base_scan_filtered/topic", self.move_base_node_global_costmap_base_scan)
-        # rospy.set_param("/move_base_node/local_costmap/obstacle_layer/base_scan_filtered/topic", self.move_base_node_local_costmap_base_scan)
-        # rospy.set_param("/safe_teleop_base/local_costmap/obstacle_layer/base_scan_filtered/topic", self.safe_teleop_base_local_costmap_base_scan)
-        # rospy.set_param("/move_base_node/global_costmap/obstacle_layer/tilt_scan_filtered/topic", self.move_base_node_global_costmap_tilt_scan)
-        # rospy.set_param("/move_base_node/local_costmap/obstacle_layer/tilt_scan_filtered/topic", self.move_base_node_local_costmap_tilt_scan)
-        # rospy.set_param("/safe_teleop_base/local_costmap/obstacle_layer/tilt_scan_filtered/topic", self.safe_teleop_base_local_costmap_tilt_scan)
         for client, footprint in zip(self.clients, self.footprints):
             client.update_configuration({"footprint": footprint})        
+        for param, topic in zip(self.params, self.move_base_topics):
+            rospy.set_param(param, topic)
+        rosnode.kill_nodes(["/move_base_node"])
 
 if __name__ == '__main__':
     rospy.init_node("set_params")
