@@ -37,7 +37,7 @@
           pkg="nodelet" type="nodelet"
           args="load jsk_pcl/AttentionClipper $(arg manager)" >
       <remap from="~input/points" to="$(arg input_base_scan)" />
-      <remap from="~input/box_array" to="/boundingbox_publisher/output" />
+      <remap from="~input/box_array" to="/person_pose_array_to_boxes/output" />
       <rosparam>
         use_multiple_attention: true
         negative: true
@@ -71,7 +71,7 @@
           pkg="nodelet" type="nodelet"
           args="load jsk_pcl/AttentionClipper $(arg manager)" >
       <remap from="~input/points" to="$(arg input_tilt_scan)" />
-      <remap from="~input/box_array" to="/boundingbox_publisher/output" />
+      <remap from="~input/box_array" to="/person_pose_array_to_boxes/output" />
       <rosparam>
         use_multiple_attention: true
         negative: true
