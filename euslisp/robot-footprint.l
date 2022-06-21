@@ -21,10 +21,10 @@
               (progn                
                 (setq human-fp (send self :right-footprint position))
                 (setq footprint (format nil "[~A,~A,~A]" forward-fp human-fp backward-fp))))
-          (dolist (ns footprint-ns)
-            (ros::set-dynamic-reconfigure-param ns "footprint" :string footprint))))
       (when (null boxes)
-        (setq footprint (format nil "[~A,~A]" forward-fp backward-fp)))))
+        (setq footprint (format nil "[~A,~A]" forward-fp backward-fp)))
+      (dolist (ns footprint-ns)
+        (ros::set-dynamic-reconfigure-param ns "footprint" :string footprint))))))
 
   (:left-footprint  (position)
     (let (footprint (width 0.5))
