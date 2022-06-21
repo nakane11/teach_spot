@@ -13,7 +13,8 @@
         args="manager"/>
 
   <node name="set_params"
-        pkg="teach_spot" type="set_params_fetch.py"/>
+        pkg="teach_spot" type="set_params_fetch.py"
+        output="screen"/>
 
   <node pkg="roseus" type="roseus" name="change_footprint"
         args="$(find teach_spot)/euslisp/fetch-footprint.l" >
