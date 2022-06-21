@@ -13,6 +13,8 @@ import rospy
 from geometry_msgs.msg import Point
 from geometry_msgs.msg import Pose
 from geometry_msgs.msg import Quaternion
+from jsk_recognition_msgs.msg import HumanSkeleton
+from jsk_recognition_msgs.msg import HumanSkeletonArray
 from jsk_recognition_msgs.msg import PeoplePose
 from jsk_recognition_msgs.msg import PeoplePoseArray
 from sensor_msgs.msg import CameraInfo
@@ -21,9 +23,36 @@ from sensor_msgs.msg import Image
 
 class PeoplePose2Dto3D(ConnectionBasedTransport):
 
+    limb_sequence = [[ 2,  1], [ 1, 16], [ 1, 15], [ 6, 18], [ 3, 17],
+                     [ 2,  3], [ 2,  6], [ 3,  4], [ 4,  5], [ 6,  7],
+                     [ 7,  8], [ 2,  9], [ 9, 10], [10, 11], [ 2, 12],
+                     [12, 13], [13, 14], [15, 17], [16, 18]]
+
+    index2limbname = ["Nose",
+                      "Neck",
+                      "RShoulder",
+                      "RElbow",
+                      "RWrist",
+                      "LShoulder",
+                      "LElbow",
+                      "LWrist",
+                      "RHip",
+                      "RKnee",
+                      "RAnkle",
+                      "LHip",
+                      "LKnee",
+                      "LAnkle",
+                      "REye",
+                      "LEye",
+                      "REar",
+                      "LEar",
+                      "Bkg"]
+    
     def __init__(self):
         super(self.__class__, self).__init__()
         self.sub_info = None
+        self.skeleton_pub = self.advertise(
+            '~output/skeleton', HumanSkeletonArray, queue_size=1)
         self.pose_pub = self.advertise(
             '~output/pose', PeoplePoseArray, queue_size=1)
 
@@ -89,6 +118,8 @@ class PeoplePose2Dto3D(ConnectionBasedTransport):
         elif depth_msg.encoding != '32FC1':
             rospy.logerr('Unsupported depth encoding: %s' % depth_msg.encoding)
 
+        skeleton_array_msg = HumanSkeletonArray()
+        skeleton_array_msg.header = pose_2d_array_msg.header
         pose_3d_array_msg = PeoplePoseArray()
         pose_3d_array_msg.header = pose_2d_array_msg.header
 
@@ -102,6 +133,7 @@ class PeoplePose2Dto3D(ConnectionBasedTransport):
             limb_names = pose_2d_msg.limb_names
             scores = pose_2d_msg.scores
             poses = pose_2d_msg.poses
+            skeleton_msg = HumanSkeleton()
             pose_3d_msg = PeoplePose()
             for limb_name, score, pose in zip(limb_names, scores, poses):
                 position = pose.position
@@ -122,6 +154,24 @@ class PeoplePose2Dto3D(ConnectionBasedTransport):
                     Pose(position=Point(x=x, y=y, z=z),
                          orientation=Quaternion(w=1)))
             pose_3d_array_msg.poses.append(pose_3d_msg)
+
+            for i, conn in enumerate(self.limb_sequence):
+                j1_name = self.index2limbname[conn[0] - 1]
+                j2_name = self.index2limbname[conn[1] - 1]
+                if j1_name not in pose_3d_msg.limb_names \
+                        or j2_name not in pose_3d_msg.limb_names:
+                    continue
+                j1_index = pose_3d_msg.limb_names.index(j1_name)
+                j2_index = pose_3d_msg.limb_names.index(j2_name)
+                bone_name = '{}->{}'.format(j1_name, j2_name)
+                bone = Segment(
+                    start_point=pose_3d_msg.poses[j1_index].position,
+                    end_point=pose_3d_msg.poses[j2_index].position)
+                skeleton_msg.bones.append(bone)
+                skeleton_msg.bone_names.append(bone_name)
+            skeleton_array_msg.skeletons.append(skeleton_msg)
+
+        self.skeleton_pub.publish(skeleton_array_msg)
         self.pose_pub.publish(pose_3d_array_msg)
 
 
