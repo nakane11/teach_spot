@@ -19,34 +19,53 @@ from jsk_recognition_msgs.msg import PeoplePose
 from jsk_recognition_msgs.msg import PeoplePoseArray
 from sensor_msgs.msg import CameraInfo
 from sensor_msgs.msg import Image
-
+from jsk_recognition_msgs.msg import Segment
 
 class PeoplePose2Dto3D(ConnectionBasedTransport):
 
-    limb_sequence = [[ 2,  1], [ 1, 16], [ 1, 15], [ 6, 18], [ 3, 17],
-                     [ 2,  3], [ 2,  6], [ 3,  4], [ 4,  5], [ 6,  7],
-                     [ 7,  8], [ 2,  9], [ 9, 10], [10, 11], [ 2, 12],
-                     [12, 13], [13, 14], [15, 17], [16, 18]]
+    limb_sequence = [[1,3],[3,5],[5,7],[7,9],[9,11],
+                     [1,2],[2,4],[4,6],[6,8],[8,10],
+                     [7,13],[13,15],[15,17],
+                     [6,12],[12,14],[14,16],
+                     [7,6],[13,12]]
 
-    index2limbname = ["Nose",
-                      "Neck",
-                      "RShoulder",
-                      "RElbow",
-                      "RWrist",
-                      "LShoulder",
-                      "LElbow",
-                      "LWrist",
-                      "RHip",
-                      "RKnee",
-                      "RAnkle",
-                      "LHip",
-                      "LKnee",
-                      "LAnkle",
-                      "REye",
-                      "LEye",
-                      "REar",
-                      "LEar",
-                      "Bkg"]
+    index2limbname = ["nose",
+                      "left eye",
+                      "right eye",
+                      "left ear",
+                      "right ear",
+                      "left shoulder",
+                      "right shoulder",
+                      "left elbow",
+                      "right elbow",
+                      "left wrist",
+                      "right wrist",
+                      "left hip",
+                      "right hip",
+                      "left knee",
+                      "right knee",
+                      "left ankle",
+                      "right ankle"]
+
+    # index2limbname = ["Nose",
+    #                   "Neck",
+    #                   "RShoulder",
+    #                   "RElbow",
+    #                   "RWrist",
+    #                   "LShoulder",
+    #                   "LElbow",
+    #                   "LWrist",
+    #                   "RHip",
+    #                   "RKnee",
+    #                   "RAnkle",
+    #                   "LHip",
+    #                   "LKnee",
+    #                   "LAnkle",
+    #                   "REye",
+    #                   "LEye",
+    #                   "REar",
+    #                   "LEar",
+    #                   "Bkg"]
     
     def __init__(self):
         super(self.__class__, self).__init__()
