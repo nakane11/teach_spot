@@ -5,6 +5,7 @@
   <arg name="pull_arm" default="true" />
   <arg name="look" default="true" />
   <arg name="safe" default="true" />
+  <arg name="filter" default="true" />
   
   <arg name="addpose_topic" default="/follow_waypoints/initialpose"/>
   <arg name="posearray_topic" default="/waypoints"/>
@@ -31,10 +32,12 @@
     </include>
   </group>
 
-  <include file="$(find teach_spot)/launch/human_filter_pr2.launch" >
-    <arg name="gui" value="false" />
-    <arg name="arm" value="$(arg arm)" />
-  </include>
+  <group if="$(arg filter)" >
+    <include file="$(find teach_spot)/launch/human_filter_pr2.launch" >
+      <arg name="gui" value="false" />
+      <arg name="arm" value="$(arg arm)" />
+    </include>
+  </group>
   
   <node pkg="follow_waypoints" type="follow_waypoints_server" name="follow_waypoints" output="screen" clear_params="true">
     <param name="base_frame_id" value="base_footprint"/>
