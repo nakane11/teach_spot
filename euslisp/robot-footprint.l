@@ -27,7 +27,7 @@
         (ros::set-dynamic-reconfigure-param ns "footprint" :string footprint))))))
 
   (:left-footprint  (position)
-    (let (footprint (width 0.5))
+    (let (footprint (width 0.35))
       (setq footprint (format nil "[~A,~A],[~A,~A],[~A,~A],[~A,~A]"
                                   (- (send position :x) (/ width 2.0)) (- (send position :y) (/ width 2.0))
                                   (- (send position :x) (/ width 2.0)) (+ (send position :y) (/ width 2.0))
