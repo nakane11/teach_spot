@@ -1,0 +1,8 @@
+<launch>
+  <node name="speech_to_roman"
+        pkg="teach_spot" type="speech_to_roman.py" >
+    <remap from="~output" to="/Tablet/voice_roman" />
+  </node>
+
+  <include file="$(find jsk_perception)/sample/sample_lidar_person_detection.launch" />
+</launch>
