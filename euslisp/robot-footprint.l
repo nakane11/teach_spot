@@ -11,20 +11,21 @@
     (setq footprint-ns ns))
 
   (:callback (msg)
-    (let ((boxes (send msg :boxes)) human-fp footprint)
-      (unless (null boxes)
-        (let* ((box (elt boxes 0)) (position (send (send box :pose) :position)))
-          (if (string= arm "larm")
-              (progn                
-                (setq human-fp (send self :left-footprint position))
-                (setq footprint (format nil "[~A,~A,~A]" forward-fp backward-fp human-fp)))
-              (progn                
-                (setq human-fp (send self :right-footprint position))
-                (setq footprint (format nil "[~A,~A,~A]" forward-fp human-fp backward-fp))))
-      (when (null boxes)
-        (setq footprint (format nil "[~A,~A]" forward-fp backward-fp)))
-      (dolist (ns footprint-ns)
-        (ros::set-dynamic-reconfigure-param ns "footprint" :string footprint))))))
+      (let ((boxes (send msg :boxes)) human-fp footprint)
+        (unless (null boxes)
+          (let* ((box (elt boxes 0)) (position (send (send box :pose) :position)))
+            (if (string= arm "larm")
+                (progn
+                  (setq human-fp (send self :left-footprint position))
+                  (setq footprint (format nil "[~A,~A,~A]" forward-fp backward-fp human-fp)))
+                (progn
+                  (setq human-fp (send self :right-footprint position))
+                  (setq footprint (format nil "[~A,~A,~A]" forward-fp human-fp backward-fp))))))
+        (when (null boxes)
+          (setq footprint (format nil "[~A,~A]" forward-fp backward-fp)))
+        (ros::ros-info "~A" footprint)
+        (dolist (ns footprint-ns)
+          (ros::set-dynamic-reconfigure-param ns "footprint" :string footprint))))
 
   (:left-footprint  (position)
     (let (footprint (width 0.35))
