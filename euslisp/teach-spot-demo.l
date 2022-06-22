@@ -171,6 +171,7 @@
                   (setq spot-list nil))
 
                  ((substringp "に行こう" text)
+                  (send *ri* :speak-jp "はい")
                   (setq goal-name (my-string-right-trim "niikou" roman-text))
                   (setq goal-n (send spot-graph :node goal-name))
                   (ros::ros-info "goal-node: ~A" (send goal-n :name))
@@ -253,7 +254,7 @@
                     (unless (null spot-coords)
                       (ros::ros-info "spot-name: ~A" (cadr spot-name))
                       (push (cadr spot-name) spot-list)
-                      (send *ri* :speak-jp (format nil "~A" (cadr spot-name)))
+                      (send *ri* :speak-jp (format nil "~Aですね" (cadr spot-name)))
                       (unless (null prev-n)
                         (when (< (abs (coords-difference spot-coords (send prev-n :get :coords))) 0.25)
                           (unless (send prev-n :get :name-jp)
@@ -272,7 +273,8 @@
                     (send *ri* :speak-jp "に行けます")))
                  
                  ((string-equal "グラフを出して" text) (send self :output-graph))
-                 (t nil))))
+                 (t (send *ri* :speak-jp text)
+                    (send *ri* :speak-jp "ですか")))))
 
   (:run ()
         (case mode          
