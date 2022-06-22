@@ -6,6 +6,7 @@
   <arg name="look" default="true" />
   <arg name="safe" default="true" />
   <arg name="filter" default="true" />
+  <arg name="virtual_force_params" default="sample_pr2_pull_arm.yaml" />
   
   <arg name="addpose_topic" default="/follow_waypoints/initialpose"/>
   <arg name="posearray_topic" default="/waypoints"/>
@@ -29,6 +30,7 @@
       <arg name="larm" value="$(arg larm)" />
       <arg name="look" value="$(arg look)" />
       <arg name="safe" value="$(arg safe)" />
+      <arg name="input_file" value="$(arg virtual_force_params)" />
     </include>
   </group>
 
