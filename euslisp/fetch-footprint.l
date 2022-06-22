@@ -13,9 +13,9 @@
                  :backward-fp "[0,-0.3],[-0.115,-0.277],[-0.212,-0.212],[-0.277,-0.115],[-0.3,0],[-0.277,0.115],[-0.212,0.212],[-0.115,0.277],[0,0.3]"
                  :footprint-ns (list "/move_base/global_costmap"
                                      "/move_base/local_costmap"
-                                     "/safe_teleop_base/local_costmap"))
-   (ros::wait-for-service "/move_base/global_costmap/set_parameters")
-   (ros::wait-for-service "/move_base/local_costmap/set_parameters")
+                                     "/safe_teleop_base/local_costmap")
+                 :service-list (list "/move_base/global_costmap/set_parameters"
+                                     "/move_base/local_costmap/set_parameters"))
    (ros::subscribe "/person_pose_array_to_boxes/output" jsk_recognition_msgs::BoundingBoxArray #'send self :callback)))
 
 (instance fetch-footprint :init)

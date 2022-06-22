@@ -1,14 +1,15 @@
 (ros::roseus-add-msgs "jsk_recognition_msgs")
 
 (defclass robot-footprint
-  :slots (arm forward-fp backward-fp footprint-ns))
+  :slots (arm forward-fp backward-fp footprint-ns service-list))
 
 (defmethod robot-footprint
-  (:init (&key target-arm ((:forward-fp for)) ((:backward-fp back)) ((:footprint-ns ns)))
+  (:init (&key target-arm ((:forward-fp for)) ((:backward-fp back)) ((:footprint-ns ns)) ((:service-list service)))
     (setq arm target-arm)
     (setq forward-fp for)
     (setq backward-fp back)
-    (setq footprint-ns ns))
+    (setq footprint-ns ns)
+    (setq service-list service))
 
   (:callback (msg)
       (let ((boxes (send msg :boxes)) human-fp footprint)
@@ -23,7 +24,8 @@
                   (setq footprint (format nil "[~A,~A,~A]" forward-fp human-fp backward-fp))))))
         (when (null boxes)
           (setq footprint (format nil "[~A,~A]" forward-fp backward-fp)))
-        (ros::ros-info "~A" footprint)
+        (dolist (s service-list)
+          (ros::wait-for-service s))
         (dolist (ns footprint-ns)
           (ros::set-dynamic-reconfigure-param ns "footprint" :string footprint))))
 
