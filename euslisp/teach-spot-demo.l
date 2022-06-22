@@ -273,8 +273,10 @@
                     (send *ri* :speak-jp "に行けます")))
                  
                  ((string-equal "グラフを出して" text) (send self :output-graph))
-                 (t (send *ri* :speak-jp text)
-                    (send *ri* :speak-jp "ですか")))))
+                 (t
+                  (unless (null text)
+                    (send *ri* :speak-jp text)
+                    (send *ri* :speak-jp "ですか"))))))
 
   (:run ()
         (case mode          
