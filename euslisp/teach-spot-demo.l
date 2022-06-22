@@ -159,7 +159,7 @@
               (send spot-graph :write-to-file (format nil "~A" (send (ros::time-now) :to-nsec) path "output" "jpg")))
 
   (:voice-cb (msg)
-             (let ((text (elt (send msg :transcript) 0))
+             (let ((text (car (send msg :transcript)))
                    (roman-text (elt (send msg :transcript) 1))
                    (seq-count 0))
                (ros::ros-info "text:~A" text)
@@ -275,8 +275,7 @@
                  ((string-equal "グラフを出して" text) (send self :output-graph))
                  (t
                   (unless (null text)
-                    (send *ri* :speak-jp text)
-                    (send *ri* :speak-jp "ですか"))))))
+                    (send *ri* :speak-jp (format nil "~Aですか" text)))))))
 
   (:run ()
         (case mode          
