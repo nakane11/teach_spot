@@ -1,0 +1,50 @@
+<launch>
+  <arg name="input_camera_info" value="/head_camera/rgb/camera_info" />
+  <arg name="input_depth_image" value="/head_camera/depth_registered/hw_registered/image_rect" />
+  <arg name="input_pose_array" value="/edgetpu_human_pose_estimator/output/poses" />
+
+  <include file="$(find jsk_perception)/sample/sample_lidar_person_detection.launch" />
+
+  <node name="people_pose_2d_to_3d"
+        pkg="teach_spot" type="people_pose_2d_to_3d.py">
+    <remap from="~input/pose" to="$(arg input_pose_array)" />
+    <remap from="~input/info" to="$(arg input_camera_info)" />
+    <remap from="~input/depth" to="$(arg input_depth_image)" />
+    <rosparam subst_value="true">
+      approximate_sync: true
+      queue_size: 100
+    </rosparam>
+  </node>
+
+  <node name="person_pose_array_to_boxes"
+        pkg="teach_spot" type="person_pose_array_to_boxes.py">
+    <remap from="~input" to="/dr_spaam_lidar_person_detection/output" />
+    <rosparam>
+      target_arm: $(arg arm)
+      base_frame_id: base_link
+    </rosparam>
+  </node>
+
+  <node name="arm_bounding_box_array_publisher"
+       pkg="jsk_recognition_utils" type="bounding_box_array_publisher.py">
+    <rosparam>
+      frame_id: gripper_link
+      boxes:
+      - position: [-0.18, 0.0, 0.0]
+        dimension: [0.45, 0.24, 0.24]
+    </rosparam>
+  </node>
+   
+  <node name="add_bounding_box_array"
+        pkg="jsk_recognition_utils" type="add_bounding_box_array.py"
+        clear_params="true">
+    <rosparam subst_value="true">
+      approximate_sync: true
+      slop: 0.9  # input topics are slow (~1Hz)
+      topics:
+      - arm_bounding_box_array_publisher/output
+      - person_pose_array_to_boxes/output
+    </rosparam>
+  </node>
+  
+</launch>

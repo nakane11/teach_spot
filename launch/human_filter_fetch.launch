@@ -25,34 +25,20 @@
     <param name="arm" value="$(arg arm)"/>
   </node>
 
-  <include file="$(find jsk_perception)/sample/sample_lidar_person_detection.launch" />
+  <include file="$(find teach_spot)/launch/fetch_bounding_box.launch" />
 
-  <node name="people_pose_2d_to_3d"
-        pkg="teach_spot" type="people_pose_2d_to_3d.py">
-    <remap from="~input/pose" to="$(arg input_pose_array)" />
-    <remap from="~input/info" to="$(arg input_camera_info)" />
-    <remap from="~input/depth" to="$(arg input_depth_image)" />
-    <rosparam subst_value="true">
-      approximate_sync: true
-      queue_size: 100
-    </rosparam>
+  <node name="base_scan_to_base_scan_filtered"
+        pkg="pointcloud_to_laserscan" type="laserscan_to_pointcloud_node" >
+    <remap from="scan_in" to="$(arg input_base_scan)"/>
+    <remap from="cloud" to="/base_scan_filtered"/>
   </node>
-
-  <node name="person_pose_array_to_boxes"
-        pkg="teach_spot" type="person_pose_array_to_boxes.py">
-    <remap from="~input" to="/dr_spaam_lidar_person_detection/output" />
-    <rosparam>
-      target_arm: $(arg arm)
-      base_frame_id: base_link
-    </rosparam>
-  </node>
-
+  
   <group ns="filter_base_laser_scan" >
     <node name="attention_clipper"
           pkg="nodelet" type="nodelet"
           args="load jsk_pcl/AttentionClipper $(arg manager)" >
-      <remap from="~input/points" to="$(arg input_base_scan)" />
-      <remap from="~input/box_array" to="/person_pose_array_to_boxes/output" />
+      <remap from="~input/points" to="/base_scan_filtered" />
+      <remap from="~input/box_array" to="/add_bounding_box_array/output" />
       <rosparam>
         use_multiple_attention: true
         negative: true
@@ -64,7 +50,7 @@
     <node name="extract_indices"
           pkg="nodelet" type="nodelet"
           args="load jsk_pcl/ExtractIndices $(arg manager)">
-      <remap from="~input" to="$(arg input_base_scan)" />
+      <remap from="~input" to="/base_scan_filtered" />
       <remap from="~indices" to="attention_clipper/output/point_indices" />
       <remap from="~output" to="/base_scan_filtered_non_human" />
       <rosparam>
@@ -76,7 +62,7 @@
 
     <node name="pointcloud_mux"
           pkg="topic_tools" type="mux"
-          args="$(arg input_base_scan)_mux /base_scan_filtered_non_human $(arg input_base_scan)" >
+          args="$(arg input_base_scan)_mux /base_scan_filtered_non_human /base_scan_filtered" >
       <remap from="mux" to="pointcloud_mux"/>
     </node>
   </group>
