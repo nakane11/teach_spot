@@ -12,9 +12,13 @@ class SetParams():
                        "/safe_teleop_base/local_costmap/obstacles/base_scan/topic",
                        "/move_base/global_costmap/obstacles/base_scan/data_type",
                        "/move_base/local_costmap/obstacles/base_scan/data_type",
-                       "/safe_teleop_base/local_costmap/obstacles/base_scan/data_type"]
+                       "/safe_teleop_base/local_costmap/obstacles/base_scan/data_type",
+                       "/move_base/global_costmap/obstacles/depth_topic",
+                       "/move_base/local_costmap/obstacles/depth_topic",
+                       "/safe_teleop_base/local_costmap/obstacles/depth_topic"]
         self.mux_topics = ["/base_scan_mux", "/base_scan_mux", "/base_scan_mux",
-                           "PointCloud2", "PointCloud2", "PointCloud2"]
+                           "PointCloud2", "PointCloud2", "PointCloud2",
+                           "/depth_image_mux", "/depth_image_mux", "/depth_image_mux"]
         rospy.on_shutdown(self.restore_params)
         self.store_params()
         self.clients = [dynamic_reconfigure.client.Client("/move_base/global_costmap/"),
@@ -37,7 +41,10 @@ class SetParams():
                   ("/safe_teleop_base/local_costmap/obstacles/base_scan/topic", "/base_scan"),
                   ("/move_base/global_costmap/obstacles/base_scan/data_type", "/LaserScan"),
                   ("/move_base/local_costmap/obstacles/base_scan/data_type", "/LaserScan"),
-                  ("/safe_teleop_base/local_costmap/obstacles/base_scan/data_type", "/LaserScan")]
+                  ("/safe_teleop_base/local_costmap/obstacles/base_scan/data_type", "/LaserScan"),
+                  ("/move_base/global_costmap/obstacles/depth_topic", "/head_camera/depth_downsample/image_raw"),
+                  ("/move_base/local_costmap/obstacles/depth_topic", "/head_camera/depth_downsample/image_raw"),
+                  ("/safe_teleop_base/local_costmap/obstacles/depth_topic", "/head_camera/depth_downsample/image_raw")]
         for param, topic in params:
             rospy.set_param(param, topic)
         self.print_params()
@@ -48,7 +55,10 @@ class SetParams():
                   ("/safe_teleop_base/local_costmap/obstacles/base_scan/topic", "/base_scan"),
                   ("/move_base/global_costmap/obstacles/base_scan/data_type", "/LaserScan"),
                   ("/move_base/local_costmap/obstacles/base_scan/data_type", "/LaserScan"),
-                  ("/safe_teleop_base/local_costmap/obstacles/base_scan/data_type", "/LaserScan")]
+                  ("/safe_teleop_base/local_costmap/obstacles/base_scan/data_type", "/LaserScan"),
+                  ("/move_base/global_costmap/obstacles/depth_topic", "/head_camera/depth_downsample/image_raw"),
+                  ("/move_base/local_costmap/obstacles/depth_topic", "/head_camera/depth_downsample/image_raw"),
+                  ("/safe_teleop_base/local_costmap/obstacles/depth_topic", "/head_camera/depth_downsample/image_raw")]
         for param, _ in params:
             print("{} {}".format(param, rospy.get_param(param)))
 

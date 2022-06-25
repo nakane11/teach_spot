@@ -5,9 +5,8 @@
   <!-- <arg name="input_cloud" value="/kinect_head/depth_registered/points" /> -->
   <!-- <arg name="input_cloud" value="/kinect_head/depth_registered/quater/points" /> -->
   <arg name="input_base_scan" value="/base_scan" />
-  <arg name="input_camera_info" value="/head_camera/rgb/camera_info" />
-  <arg name="input_depth_image" value="/head_camera/depth_registered/hw_registered/image_rect" />
-  <arg name="input_pose_array" value="/edgetpu_human_pose_estimator/output/poses" />
+  <arg name="input_depth_cloud" value="/head_camera/depth_downsample/points" />
+  <arg name="input_depth_image" value="/head_camera/depth_downsample/image_rect_raw" />
 
   <arg name="manager_name" default="hand_navigation_pr2_manager" />
   <arg name="manager" default="/$(arg manager_name)" />
@@ -33,7 +32,7 @@
     <remap from="cloud" to="/base_scan_filtered"/>
   </node>
   
-  <group ns="filter_base_laser_scan" >
+  <group ns="filter_base_scan" >
     <node name="attention_clipper"
           pkg="nodelet" type="nodelet"
           args="load jsk_pcl/AttentionClipper $(arg manager)" >
@@ -64,6 +63,50 @@
           pkg="topic_tools" type="mux"
           args="$(arg input_base_scan)_mux /base_scan_filtered_non_human /base_scan_filtered" >
       <remap from="mux" to="pointcloud_mux"/>
+    </node>
+  </group>
+
+  <group ns="filter_depth_image" >
+    <node name="attention_clipper"
+          pkg="nodelet" type="nodelet"
+          args="load jsk_pcl/AttentionClipper $(arg manager)" >
+      <remap from="~input/points" to="$(arg input_depth_cloud)" />
+      <remap from="~input/box_array" to="/add_bounding_box_array/output" />
+      <rosparam>
+        use_multiple_attention: true
+        negative: true
+        approximate_sync: true
+        queue_size: 1000
+      </rosparam>
+    </node>
+
+    <node name="point_indices_to_mask_image"
+          pkg="nodelet" type="nodelet"
+          args="load jsk_pcl_utils/PointIndicesToMaskImage $(arg manager)">
+      <remap from="~input" to="attention_clipper/output/point_indices" />
+      <rosparam>
+        static_image_size: true
+        height: 120
+        width: 160
+      </rosparam>
+    </node>
+
+    <node name="apply_mask_image"
+          pkg="nodelet" type="nodelet"
+          args="load jsk_pcl_utils/PointIndicesToMaskImage $(arg manager)">
+      <remap from="~input" to="$(arg input_depth_image)" />
+      <remap from="~input/mask" to="point_indices_to_mask_image/output" />
+      <remap from="~output" to="/depth_image_non_human" />
+      <rosparam>
+        approximate_sync: true
+        clip: false
+      </rosparam>
+    </node>
+
+    <node name="depth_image_mux"
+          pkg="topic_tools" type="mux"
+          args="/depth_image_mux  /depth_image_no_human /head_camera/depth_downsample/image_raw" >
+      <remap from="mux" to="depth_image_mux"/>
     </node>
   </group>
 
