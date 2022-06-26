@@ -6,7 +6,7 @@
   <!-- <arg name="input_cloud" value="/kinect_head/depth_registered/quater/points" /> -->
   <arg name="input_base_scan" value="/base_scan" />
   <arg name="input_depth_cloud" value="/head_camera/depth_downsample/points" />
-  <arg name="input_depth_image" value="/head_camera/depth_downsample/image_rect_raw" />
+  <arg name="input_depth_image" value="/head_camera/depth_downsample/image_raw" />
 
   <arg name="manager_name" default="hand_navigation_pr2_manager" />
   <arg name="manager" default="/$(arg manager_name)" />
@@ -93,7 +93,7 @@
 
     <node name="apply_mask_image"
           pkg="nodelet" type="nodelet"
-          args="load jsk_pcl_utils/PointIndicesToMaskImage $(arg manager)">
+          args="load jsk_perception/ApplyMaskImage $(arg manager)">
       <remap from="~input" to="$(arg input_depth_image)" />
       <remap from="~input/mask" to="point_indices_to_mask_image/output" />
       <remap from="~output" to="/depth_image_non_human" />
@@ -105,7 +105,7 @@
 
     <node name="depth_image_mux"
           pkg="topic_tools" type="mux"
-          args="/depth_image_mux  /depth_image_no_human /head_camera/depth_downsample/image_raw" >
+          args="/depth_image_mux  /depth_image_non_human $(arg input_depth_image)" >
       <remap from="mux" to="depth_image_mux"/>
     </node>
   </group>
