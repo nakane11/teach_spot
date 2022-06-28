@@ -8,5 +8,19 @@
     <arg name="continuous" default="true" />
   </include>
 
-  <include file="$(find jsk_perception)/sample/sample_lidar_person_detection.launch" />
+  <node name="dr_spaam_lidar_person_detection"
+        pkg="jsk_perception" type="lidar_person_detection_node.py"
+        output="screen">
+    <remap from="~input" to="/base_scan" />
+    <rosparam subst_value="true" >
+      map_link: /map
+      weight_file: "$(find jsk_perception)/trained_data/lidar_person_detection/ckpt_jrdb_ann_dr_spaam_e20.pth"
+      detector_model: "DR-SPAAM"
+      conf_thresh: 0.8
+      stride: 1
+      panoramic_scan: false
+      gpu: $(arg gpu)
+    </rosparam>
+  </node>
+
 </launch>

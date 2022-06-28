@@ -11,12 +11,6 @@
   <arg name="addpose_topic" default="/follow_waypoints/initialpose"/>
   <arg name="posearray_topic" default="/waypoints"/>
 
-
-  <include file="$(find teach_spot)/launch/speech_recognition.launch" >
-    <arg name="language" default="ja-JP" />
-    <arg name="continuous" default="true" />
-  </include>
-
   <node name="speech_to_roman"
         pkg="teach_spot" type="speech_to_roman.py" >
     <remap from="~output" to="/Tablet/voice_roman" />

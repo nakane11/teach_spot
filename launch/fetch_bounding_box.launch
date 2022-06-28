@@ -3,7 +3,7 @@
   <arg name="input_depth_image" value="/head_camera/depth_registered/hw_registered/image_rect" />
   <arg name="input_pose_array" value="/edgetpu_human_pose_estimator/output/poses" />
 
-  <include file="$(find jsk_perception)/sample/sample_lidar_person_detection.launch" />
+  <!-- <include file="$(find jsk_perception)/sample/sample_lidar_person_detection.launch" /> -->
 
   <node name="people_pose_2d_to_3d"
         pkg="teach_spot" type="people_pose_2d_to_3d.py">
