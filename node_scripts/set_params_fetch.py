@@ -6,7 +6,7 @@ import dynamic_reconfigure.client
 class SetParams():
 
     def __init__(self):
-        # self.set_default_params()
+        self.set_default_params()
         self.params = ["/move_base/global_costmap/obstacles/base_scan/topic",
                        "/move_base/local_costmap/obstacles/base_scan/topic",
                        "/safe_teleop_base/local_costmap/obstacles/base_scan/topic",

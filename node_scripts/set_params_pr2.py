@@ -6,15 +6,15 @@ import dynamic_reconfigure.client
 class SetParams():
 
     def __init__(self):
-        # self.set_default_params()
+        self.set_default_params()
         self.params = ["/move_base_node/global_costmap/obstacle_layer/base_scan_filtered/topic",
                        "/move_base_node/local_costmap/obstacle_layer/base_scan_filtered/topic",
                        "/safe_teleop_base/local_costmap/obstacle_layer/base_scan_filtered/topic",
                        "/move_base_node/global_costmap/obstacle_layer/tilt_scan_filtered/topic",
                        "/move_base_node/local_costmap/obstacle_layer/tilt_scan_filtered/topic",
                        "/safe_teleop_base/local_costmap/obstacle_layer/tilt_scan_filtered/topic"]
-        self.mux_topics = ["/base_scan_mux", "/base_scan_mux", "/base_scan_mux",
-                       "/tilt_scan_mux", "/tilt_scan_mux", "/tilt_scan_mux"]
+        self.mux_topics = ["/base_scan_filtered_mux", "/base_scan_filtered_mux", "/base_scan_filtered_mux",
+                       "/tilt_scan_filtered_mux", "/tilt_scan_filtered_mux", "/tilt_scan_filtered_mux"]
         rospy.on_shutdown(self.restore_params)
         self.store_params()
         self.clients = [dynamic_reconfigure.client.Client("/move_base_node/global_costmap/"),
