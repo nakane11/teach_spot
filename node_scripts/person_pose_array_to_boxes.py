@@ -52,7 +52,7 @@ class PersonPoseArrayToBoxes(ConnectionBasedTransport):
                 x, y, z)
             if y * (1 if self._arm == "larm" else -1) > 0:
                 continue
-            if np.sqrt(x ** 2 + y ** 2) > 0.8:
+            if np.sqrt(x ** 2 + y ** 2) > 1.0:
                 continue
             pose_array.append([x, y, z])
         
