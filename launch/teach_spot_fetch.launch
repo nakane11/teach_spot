@@ -11,11 +11,6 @@
   <arg name="addpose_topic" default="/follow_waypoints/initialpose"/>
   <arg name="posearray_topic" default="/waypoints"/>
 
-  <node name="speech_to_roman"
-        pkg="teach_spot" type="speech_to_roman.py" >
-    <remap from="~output" to="/Tablet/voice_roman" />
-  </node>
-
   <group if="$(arg pull_arm)" >
     <include file="$(find virtual_force_drag)/launch/fetch_virtual_force_drag.launch" >
       <arg name="look" value="$(arg look)" />

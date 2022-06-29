@@ -31,7 +31,7 @@
       frame_id: gripper_link
       boxes:
       - position: [-0.18, 0.0, 0.0]
-        dimension: [0.45, 0.24, 0.24]
+        dimension: [0.60, 0.30, 0.30]
     </rosparam>
   </node>
    

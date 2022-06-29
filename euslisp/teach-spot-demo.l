@@ -217,7 +217,7 @@
                           (if (eq (send (send client :get-result) :result) 4)
                               (progn
                                 (setq prev-n goal-n)
-                                (send *ri* :speak-jp (format nil "~Aに到着しました" goal-name)))
+                                (send *ri* :speak-jp (format nil "~Aに到着しました" (send goal-n :get :name-jp)) :wait t))
                               (progn
                                 (send *ri* :speak-jp (format nil "失敗しました"))
                                 (setq prev-n nil)))

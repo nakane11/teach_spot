@@ -69,8 +69,8 @@ class PersonPoseArrayToBoxes(ConnectionBasedTransport):
             bbox_msg.pose.orientation.y = 0
             bbox_msg.pose.orientation.z = 0
             bbox_msg.pose.orientation.w = 1
-            bbox_msg.dimensions.x = 0.6
-            bbox_msg.dimensions.y = 0.6
+            bbox_msg.dimensions.x = 0.7
+            bbox_msg.dimensions.y = 0.7
             bbox_msg.dimensions.z = 2.0
             bbox_array_msg.boxes.append(bbox_msg)
 
