@@ -192,6 +192,7 @@
                         (send spot-graph :start-state start-n)
                         (send spot-graph :goal-state goal-n)
                         (setq path (send sol :solve spot-graph))
+                        (send sol :clear-open-list)
                         (when path
                           (setq mode :navigation)
                           (ros::publish "/path_reset" (instance std_msgs::empty :init))
