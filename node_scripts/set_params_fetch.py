@@ -39,9 +39,9 @@ class SetParams():
         params = [("/move_base/global_costmap/obstacles/base_scan/topic", "/base_scan"),
                   ("/move_base/local_costmap/obstacles/base_scan/topic", "/base_scan"),
                   ("/safe_teleop_base/local_costmap/obstacles/base_scan/topic", "/base_scan"),
-                  ("/move_base/global_costmap/obstacles/base_scan/data_type", "/LaserScan"),
-                  ("/move_base/local_costmap/obstacles/base_scan/data_type", "/LaserScan"),
-                  ("/safe_teleop_base/local_costmap/obstacles/base_scan/data_type", "/LaserScan"),
+                  ("/move_base/global_costmap/obstacles/base_scan/data_type", "LaserScan"),
+                  ("/move_base/local_costmap/obstacles/base_scan/data_type", "LaserScan"),
+                  ("/safe_teleop_base/local_costmap/obstacles/base_scan/data_type", "LaserScan"),
                   ("/move_base/global_costmap/obstacles/depth_topic", "/head_camera/depth_downsample/image_raw"),
                   ("/move_base/local_costmap/obstacles/depth_topic", "/head_camera/depth_downsample/image_raw"),
                   ("/safe_teleop_base/local_costmap/obstacles/depth_topic", "/head_camera/depth_downsample/image_raw")]
