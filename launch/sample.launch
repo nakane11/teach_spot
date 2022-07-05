@@ -1,0 +1,44 @@
+<launch>
+  <arg name="addpose_topic" default="/follow_waypoints/initialpose"/>
+  <arg name="posearray_topic" default="/waypoints"/>
+
+  <param name="/use_sim_time" value="true" />
+  <param name="robot_description" textfile="$(find fetch_description)/robots/fetch.urdf" />
+
+  <node name="rosbag_play"
+        pkg="rosbag" type="play"
+        args="/home/nakane/teach_spot_20220629-212524.bag --clock --loop">
+  </node>
+
+  <node name="speech_to_roman"
+        pkg="teach_spot" type="speech_to_roman.py" >
+    <remap from="~output" to="/Tablet/voice_roman" />
+  </node>
+
+  <include file="$(find teach_spot)/launch/speech_recognition.launch" >
+    <arg name="language" default="ja-JP" />
+    <arg name="continuous" default="true" />
+  </include>
+
+  <node name="tf_to_amcl"
+        pkg="teach_spot" type="tf_to_amcl.py">
+  </node>
+
+  <include file="$(find teach_spot)/launch/fetch_bounding_box.launch" />
+
+  <node pkg="roseus" type="roseus" name="teach_spot_demo" output="screen"
+        args="$(find teach_spot)/euslisp/teach-spot-demo.l" >
+    <param name="robot" value="fetch"/>
+  </node>
+
+  <node pkg="follow_waypoints" type="follow_waypoints_server" name="follow_waypoints" output="screen" clear_params="true">
+    <param name="base_frame_id" value="base_link"/>
+    <param name="goal_frame_id" value="map"/>
+    <param name="odom_frame_id" value="odom_combined" />
+    <param name="addpose_topic" value="$(arg addpose_topic)"/>
+    <param name="posearray_topic" value="$(arg posearray_topic)"/>
+    <param name="waypoint_distance_tolerance" value="0.5"/>
+    <param name="timeout" value="30"/>
+  </node>
+  
+</launch>  
