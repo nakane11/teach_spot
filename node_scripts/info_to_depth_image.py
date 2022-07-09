@@ -11,7 +11,7 @@ class InfoToDepthImage(ConnectionBasedTransport):
 
     def __init__(self):
         super(InfoToDepthImage, self).__init__()
-        self.frame_height = rospy.get_param('frame_height', 2.0)
+        self.frame_height = rospy.get_param('~frame_height', 2.0)
         self.bridge = cv_bridge.CvBridge()
         self.pub_image = self.advertise(
             '~output', Image, queue_size=1)
