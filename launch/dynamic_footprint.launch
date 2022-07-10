@@ -4,6 +4,10 @@
   <arg name="camera_height" default="5.0" />
   <arg name="virtual_camera_frame" default="virtual_camera_frame" />
     
+  <node name="$(arg MANAGER)"
+        pkg="nodelet" type="nodelet"
+        args="manager"/>
+
   <node name="virtual_camera_mono"
         pkg="jsk_perception" type="virtual_camera_mono"
         output="screen"
@@ -69,8 +73,7 @@
 
   <node name="apply_mask_image"
         pkg="nodelet" type="nodelet"
-        args="standalone jsk_perception/ApplyMaskImage $(arg MANAGER)"
-        respawn="false" >
+        args="standalone jsk_perception/ApplyMaskImage $(arg MANAGER)" >
     <remap from="~input" to="/info_to_depth_image/output" />
     <remap from="~input/mask" to="/robot_to_mask_image/output" />
     <rosparam>
@@ -82,7 +85,6 @@
 
   <node pkg="nodelet" type="nodelet" name="depth_image_to_pointcloud"
         args="standalone depth_image_proc/point_cloud_xyz $(arg MANAGER)">
-    <!-- <remap from="camera_info" to="/virtual_camera_mono/camera_info"/> -->
     <remap from="/apply_mask_image/camera_info" to="/virtual_camera_mono/camera_info"/>
     <remap from="image_rect" to="/apply_mask_image/output"/>
     <remap from="points" to="/footpoints"/>
@@ -101,6 +103,31 @@
       min_size: 1
       distance_threashold: 0.3
     </rosparam>
+  </node>
+
+  <node name="polygon_array_transformer"
+        pkg="nodelet" type="nodelet"
+        args="standalone jsk_pcl_utils/PolygonArrayTransformer $(arg MANAGER)" >
+    <remap from="~input_polygons" to="/organized_multi_plane_segmentation/output_nonconnected_polygon"/>
+    <remap from="~input_coefficients" to="/organized_multi_plane_segmentation/output_nonconnected_coefficients"/>
+    <rosparam>
+      frame_id: base_link
+    </rosparam>
+  </node>
+
+  <node name="polygon_array_to_polygon"
+        pkg="jsk_recognition_utils" type="polygon_array_to_polygon.py"
+        output="screen">
+    <remap from="~input" to="/polygon_array_transformer/output_polygons"/>
+    <remap from="~output" to="/dynamic_footprint"/>
+    <rosparam>
+      index: 1
+    </rosparam>
+  </node>
+
+  <node name="set_footprint_topic"
+        pkg="teach_spot" type="set_footprint_topic_pr2.py"
+        output="screen">
   </node>
   
 </launch>
