@@ -121,7 +121,7 @@
     <remap from="~input" to="/polygon_array_transformer/output_polygons"/>
     <remap from="~output" to="/dynamic_footprint"/>
     <rosparam>
-      index: 1
+      index: 0
     </rosparam>
   </node>
 
