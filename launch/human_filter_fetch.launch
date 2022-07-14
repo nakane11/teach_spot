@@ -26,17 +26,17 @@
 
   <include file="$(find teach_spot)/launch/fetch_bounding_box.launch" />
 
-  <node name="base_scan_to_base_scan_filtered"
+  <node name="base_scan_to_pointcloud"
         pkg="pointcloud_to_laserscan" type="laserscan_to_pointcloud_node" >
     <remap from="scan_in" to="$(arg input_base_scan)"/>
-    <remap from="cloud" to="/base_scan_filtered"/>
+    <remap from="cloud" to="/base_scan/points"/>
   </node>
   
   <group ns="filter_base_scan" >
     <node name="attention_clipper"
           pkg="nodelet" type="nodelet"
           args="load jsk_pcl/AttentionClipper $(arg manager)" >
-      <remap from="~input/points" to="/base_scan_filtered" />
+      <remap from="~input/points" to="/base_scan/points" />
       <remap from="~input/box_array" to="/add_bounding_box_array/output" />
       <rosparam>
         use_multiple_attention: true
@@ -49,9 +49,9 @@
     <node name="extract_indices"
           pkg="nodelet" type="nodelet"
           args="load jsk_pcl/ExtractIndices $(arg manager)">
-      <remap from="~input" to="/base_scan_filtered" />
+      <remap from="~input" to="/base_scan/points" />
       <remap from="~indices" to="attention_clipper/output/point_indices" />
-      <remap from="~output" to="/base_scan_filtered_non_human" />
+      <remap from="~output" to="/base_scan/points_non_human" />
       <rosparam>
         keep_organized: true
         approximate_sync: true
@@ -61,7 +61,7 @@
 
     <node name="pointcloud_mux"
           pkg="topic_tools" type="mux"
-          args="$(arg input_base_scan)_mux /base_scan_filtered_non_human /base_scan_filtered" >
+          args="$(arg input_base_scan)_mux /base_scan/points_non_human /base_scan/points" >
       <remap from="mux" to="pointcloud_mux"/>
     </node>
   </group>
