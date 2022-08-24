@@ -5,7 +5,6 @@ import rosnode
 class SetFootprintTopic():
 
     def __init__(self):
-        self.set_default_params()
         self.topic_params = ["/move_base_node/global_costmap/footprint_topic",
                        "/move_base_node/local_costmap/footprint_topic",
                        "/safe_teleop_base/local_costmap/footprint_topic"]
