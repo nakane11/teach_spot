@@ -1,6 +1,6 @@
 <launch>
   <arg name="gui" default="true" />
-  <arg name="INPUT_IMAGE" default="/kinect_head/rgb/image_rect_color" />
+  <arg name="INPUT_IMAGE" default="/kinect_head/rgb/image_raw" />
   <arg name="MANAGER" default="sample_manager" />
   <arg name="camera_height" default="5.0" />
   <arg name="virtual_camera_frame" default="virtual_camera_frame" />
@@ -125,7 +125,7 @@
   </node>
 
   <node name="polygon_array_to_polygon"
-        pkg="jsk_recognition_utils" type="polygon_array_to_polygon.py"
+        pkg="teach_spot" type="polygon_array_to_polygon_nostamp.py"
         output="screen">
     <remap from="~input" to="/polygon_array_transformer/output_polygons"/>
     <remap from="~output" to="/dynamic_footprint"/>

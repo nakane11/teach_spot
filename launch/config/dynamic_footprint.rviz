@@ -6,6 +6,7 @@ Panels:
       Expanded:
         - /Global Options1
         - /Status1
+        - /Polygon1
       Splitter Ratio: 0.5
     Tree Height: 549
   - Class: rviz/Selection
@@ -26,7 +27,7 @@ Panels:
     Experimental: false
     Name: Time
     SyncMode: 0
-    SyncSource: PointCloud2
+    SyncSource: ""
 Preferences:
   PromptSaveOnExit: true
 Toolbars:
@@ -162,6 +163,42 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
+        head_chain_cb_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        head_mount_kinect_ir_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        head_mount_kinect_ir_optical_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        head_mount_kinect_rgb_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        head_mount_kinect_rgb_optical_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        head_mount_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        head_mount_prosilica_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        head_mount_prosilica_optical_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
         head_pan_link:
           Alpha: 1
           Show Axes: false
@@ -305,6 +342,10 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
+        left_arm_chain_cb_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
         narrow_stereo_l_stereo_camera_frame:
           Alpha: 1
           Show Axes: false
@@ -444,6 +485,10 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
+        right_arm_chain_cb_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
         sensor_mount_link:
           Alpha: 1
           Show Axes: false
@@ -534,7 +579,7 @@ Visualization Manager:
       Color: 239; 41; 41
       Enabled: true
       Name: Polygon
-      Topic: /dynamic_footprint
+      Topic: /move_base_node/global_costmap/footprint
       Unreliable: false
       Value: true
   Enabled: true
@@ -602,4 +647,4 @@ Window Geometry:
     collapsed: false
   Width: 1267
   X: 566
-  Y: 268
+  Y: 204
