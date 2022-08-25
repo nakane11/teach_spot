@@ -85,12 +85,12 @@ class PersonPoseArrayToMask(ConnectionBasedTransport):
         u0, v0 = self.cameramodels.project3dToPixel(pos_0)
         u1, v1 = self.cameramodels.project3dToPixel(pos_1)
         u2, v2 = self.cameramodels.project3dToPixel(pos_2)
-        mask = np.zeros(self.shape, dtype=np.uint8)
+        mask = np.full(self.shape, 255, dtype=np.uint8)
         u0 = u0.astype(int)
         u2 = u2.astype(int)
         v0 = v0.astype(int)
         v1 = v1.astype(int)
-        mask[v0:v1, u0:u2] = 255
+        mask[v0:v1, u0:u2] = 0
         mask_msg = self.bridge.cv2_to_imgmsg(mask, encoding='mono8')
         mask_msg.header = msg.header
         self.pub_mask.publish(mask_msg)

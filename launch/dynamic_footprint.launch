@@ -84,7 +84,7 @@
         pkg="nodelet" type="nodelet"
         args="standalone jsk_perception/ApplyMaskImage $(arg MANAGER)" >
     <remap from="~input" to="/info_to_depth_image/output" />
-    <remap from="~input/mask" to="/robot_to_mask_image/output" />
+    <remap from="~input/mask" to="/multiply_mask_image/output" />
     <rosparam>
       approximate_sync: true
       negative: true
