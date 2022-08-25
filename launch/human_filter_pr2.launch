@@ -23,10 +23,10 @@
         pkg="teach_spot" type="set_params_pr2.py"
         output="screen" />
 
-  <node pkg="roseus" type="roseus" name="change_footprint"
-        args="$(find teach_spot)/euslisp/pr2-footprint.l" >
-    <param name="arm" value="$(arg arm)"/>
-  </node>
+  <!-- <node pkg="roseus" type="roseus" name="change_footprint" -->
+  <!--       args="$(find teach_spot)/euslisp/pr2-footprint.l" > -->
+  <!--   <param name="arm" value="$(arg arm)"/> -->
+  <!-- </node> -->
 
   <node name="dr_spaam_lidar_person_detection"
         pkg="jsk_perception" type="lidar_person_detection_node.py"
@@ -53,6 +53,17 @@
   <!--     queue_size: 100 -->
   <!--   </rosparam> -->
   <!-- </node> -->
+
+  <node name="person_pose_array_to_mask" output="screen"
+        pkg="teach_spot" type="person_pose_array_to_mask.py">
+    <remap from="~input" to="/dr_spaam_lidar_person_detection/output" />
+    <remap from="~input/info" to="/virtual_camera_mono/camera_info" />
+
+    <rosparam>
+      target_arm: $(arg arm)
+      padding: 0.2
+    </rosparam>
+  </node>
 
   <node name="person_pose_array_to_boxes"
         pkg="teach_spot" type="person_pose_array_to_boxes.py">

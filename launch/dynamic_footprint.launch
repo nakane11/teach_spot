@@ -1,6 +1,6 @@
 <launch>
   <arg name="gui" default="true" />
-  <arg name="INPUT_IMAGE" default="/kinect_head/rgb/image_raw" />
+  <arg name="INPUT_IMAGE" default="/kinect_head/rgb/image_rect_color" />
   <arg name="MANAGER" default="sample_manager" />
   <arg name="camera_height" default="5.0" />
   <arg name="virtual_camera_frame" default="virtual_camera_frame" />
@@ -134,7 +134,7 @@
     </rosparam>
   </node>
 
-  <node name="set_footprint_topic"
+  <node name="set_footprint_topic" unless="$(arg rosbag)"
         pkg="teach_spot" type="set_footprint_topic_pr2.py"
         output="screen">
   </node>
