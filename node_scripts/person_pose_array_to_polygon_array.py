@@ -56,20 +56,20 @@ class PersonPoseArrayToPolygonArray(ConnectionBasedTransport):
             position = (x, y, z)
             break
 
-        if not position:
-            return
-
-        p0 = Point32(x=position[0] - self.padding, y=position[1] - self.padding, z=0)
-        p1 = Point32(x=position[0] - self.padding, y=position[1] + self.padding, z=0)
-        p2 = Point32(x=position[0] + self.padding, y=position[1] + self.padding, z=0)
-        p3 = Point32(x=position[0] + self.padding, y=position[1] - self.padding, z=0)
-        polygon_stamped_msg = PolygonStamped()
-        polygon_stamped_msg.header.frame_id = self.frame_id
-        polygon_stamped_msg.polygon.points = [p0, p1, p2, p3]
         polygon_array_msg = PolygonArray()
         polygon_array_msg.header = msg.header
         polygon_array_msg.header.frame_id = self.frame_id
-        polygon_array_msg.polygons.append(polygon_stamped_msg)
+
+        if position:
+            p0 = Point32(x=position[0] - self.padding, y=position[1] - self.padding, z=0)
+            p1 = Point32(x=position[0] - self.padding, y=position[1] + self.padding, z=0)
+            p2 = Point32(x=position[0] + self.padding, y=position[1] + self.padding, z=0)
+            p3 = Point32(x=position[0] + self.padding, y=position[1] - self.padding, z=0)
+            polygon_stamped_msg = PolygonStamped()
+            polygon_stamped_msg.header.frame_id = self.frame_id
+            polygon_stamped_msg.polygon.points = [p0, p1, p2, p3]
+            polygon_array_msg.polygons.append(polygon_stamped_msg)
+
         self.pub.publish(polygon_array_msg)
 
 if __name__ == '__main__':
