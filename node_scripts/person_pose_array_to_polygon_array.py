@@ -49,7 +49,7 @@ class PersonPoseArrayToPolygonArray(ConnectionBasedTransport):
             x, y, z = person.position.x, person.position.y, person.position.z
             x, y, z = pykdl_transform_cam_to_laser * PyKDL.Vector(
                 x, y, z)
-            if y * (1 if self._arm == "larm" else -1) > 0:
+            if y * (-1 if self._arm == "larm" else 1) > 0:
                 continue
             if np.sqrt(x ** 2 + y ** 2) > 1.0:
                 continue
@@ -59,11 +59,12 @@ class PersonPoseArrayToPolygonArray(ConnectionBasedTransport):
         if not position:
             return
 
-        p0 = Point32(x=position[0] - self.padding, y=position[1] - self.padding, 0)
-        p1 = Point32(x=position[0] - self.padding, y=position[1] + self.padding, 0)
-        p2 = Point32(x=position[0] + self.padding, y=position[1] + self.padding, 0)
-        p3 = Point32(x=position[0] + self.padding, y=position[1] - self.padding, 0)
+        p0 = Point32(x=position[0] - self.padding, y=position[1] - self.padding, z=0)
+        p1 = Point32(x=position[0] - self.padding, y=position[1] + self.padding, z=0)
+        p2 = Point32(x=position[0] + self.padding, y=position[1] + self.padding, z=0)
+        p3 = Point32(x=position[0] + self.padding, y=position[1] - self.padding, z=0)
         polygon_stamped_msg = PolygonStamped()
+        polygon_stamped_msg.header.frame_id = self.frame_id
         polygon_stamped_msg.polygon.points = [p0, p1, p2, p3]
         polygon_array_msg = PolygonArray()
         polygon_array_msg.header = msg.header

@@ -4,7 +4,6 @@ from copy import deepcopy
 
 import numpy as np
 from geometry_msgs.msg import PoseArray
-from jsk_recognition_msgs.msg import BoundingBox, BoundingBoxArray
 import cv_bridge
 from jsk_topic_tools import ConnectionBasedTransport
 import rospy
