@@ -84,7 +84,7 @@
         pkg="nodelet" type="nodelet"
         args="standalone jsk_perception/ApplyMaskImage $(arg MANAGER)" >
     <remap from="~input" to="/info_to_depth_image/output" />
-    <remap from="~input/mask" to="/multiply_mask_image/output" />
+    <remap from="~input/mask" to="/robot_to_mask_image/output" />
     <rosparam>
       approximate_sync: true
       negative: true
@@ -96,7 +96,7 @@
         args="standalone depth_image_proc/point_cloud_xyz $(arg MANAGER)">
     <remap from="/apply_mask_image/camera_info" to="/virtual_camera_mono/camera_info"/>
     <remap from="image_rect" to="/apply_mask_image/output"/>
-    <remap from="points" to="/footpoints"/>
+    <remap from="points" to="/robot_footpoints"/>
     <rosparam>
       queue_size: 100
     </rosparam>
@@ -106,7 +106,7 @@
         pkg="nodelet" type="nodelet"
         args="standalone jsk_pcl/OrganizedMultiPlaneSegmentation $(arg MANAGER)"
         clear_params="true">
-    <remap from="~input" to="/footpoints"/>
+    <remap from="~input" to="/robot_footpoints"/>
     <rosparam>
       publish_normal: true
       min_size: 1
@@ -119,20 +119,38 @@
         args="standalone jsk_pcl_utils/PolygonArrayTransformer $(arg MANAGER)" >
     <remap from="~input_polygons" to="/organized_multi_plane_segmentation/output_nonconnected_polygon"/>
     <remap from="~input_coefficients" to="/organized_multi_plane_segmentation/output_nonconnected_coefficients"/>
+    <remap from="~output_polygons" to="/robot_polygon"/>
     <rosparam>
       frame_id: base_link
     </rosparam>
   </node>
-
-  <node name="polygon_array_to_polygon"
-        pkg="teach_spot" type="polygon_array_to_polygon_nostamp.py"
-        output="screen">
-    <remap from="~input" to="/polygon_array_transformer/output_polygons"/>
-    <remap from="~output" to="/dynamic_footprint"/>
-    <rosparam>
-      index: 0
+  
+  <node name="person_pose_array_to_polygon_array"
+        pkg="teach_spot" type="person_pose_array_to_polygon_array.py">
+    <remap from="~input" to="/dr_spaam_lidar_person_detection/output"/>
+    <remap from="~output" to="/human_polygon"/>
+    <rosparam subst_value="true">
+      frame_id: base_link
+      target_arm: larm
+      padding: 0.2
     </rosparam>
   </node>
+
+  <node name="concave_hull_polygon"
+        pkg="teach_spot" type="concave_hull_polygon.py">
+    <remap from="~input1" to="/human_polygon"/>
+    <remap from="~input2" to="/robot_polygon"/>
+    <rosparam subst_value="true">
+      frame_id: base_link
+      number_of_input: 2
+    </rosparam>
+  </node>
+  
+  <node name="polygon_stamped_to_polygon"
+        pkg="topic_tools" type="transform"
+        args="/concave_hull_polygon/output /dynamic_footprint geometry_msgs/Polygon
+              'm.polygon'
+              --wait-for-start"/>
 
   <node name="set_footprint_topic" unless="$(arg rosbag)"
         pkg="teach_spot" type="set_footprint_topic_pr2.py"

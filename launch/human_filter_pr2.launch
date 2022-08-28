@@ -56,26 +56,26 @@
   <!--   </rosparam> -->
   <!-- </node> -->
 
-  <node name="person_pose_array_to_mask" output="screen"
-        pkg="teach_spot" type="person_pose_array_to_mask.py">
-    <remap from="~input" to="/dr_spaam_lidar_person_detection/output" />
-    <remap from="~input/info" to="/virtual_camera_mono/camera_info" />
-    <rosparam>
-      target_arm: $(arg arm)
-      padding: 0.2
-    </rosparam>
-  </node>
+  <!-- <node name="person_pose_array_to_mask" output="screen" -->
+  <!--       pkg="teach_spot" type="person_pose_array_to_mask.py"> -->
+  <!--   <remap from="~input" to="/dr_spaam_lidar_person_detection/output" /> -->
+  <!--   <remap from="~input/info" to="/virtual_camera_mono/camera_info" /> -->
+  <!--   <rosparam> -->
+  <!--     target_arm: $(arg arm) -->
+  <!--     padding: 0.2 -->
+  <!--   </rosparam> -->
+  <!-- </node> -->
 
-  <node name="multiply_mask_image"
-        pkg="nodelet" type="nodelet"
-        args="load jsk_perception/MultiplyMaskImage $(arg manager)"
-        respawn="true" >
-    <remap from="~input/src1" to="/person_pose_array_to_mask/output" />
-    <remap from="~input/src2" to="/robot_to_mask_image/output" />
-    <rosparam>
-      approximate_sync: true
-    </rosparam>
-  </node>
+  <!-- <node name="multiply_mask_image" -->
+  <!--       pkg="nodelet" type="nodelet" -->
+  <!--       args="load jsk_perception/MultiplyMaskImage $(arg manager)" -->
+  <!--       respawn="true" > -->
+  <!--   <remap from="~input/src1" to="/person_pose_array_to_mask/output" /> -->
+  <!--   <remap from="~input/src2" to="/robot_to_mask_image/output" /> -->
+  <!--   <rosparam> -->
+  <!--     approximate_sync: true -->
+  <!--   </rosparam> -->
+  <!-- </node> -->
 
   <node name="person_pose_array_to_boxes"
         pkg="teach_spot" type="person_pose_array_to_boxes.py">
