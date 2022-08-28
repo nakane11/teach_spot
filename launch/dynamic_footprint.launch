@@ -4,15 +4,6 @@
   <arg name="MANAGER" default="sample_manager" />
   <arg name="camera_height" default="5.0" />
   <arg name="virtual_camera_frame" default="virtual_camera_frame" />
-  <arg name="rosbag" default="false" />
-  <arg name="rosbag_play_args" default="--clock --loop" />
-
-  <group if="$(arg rosbag)" >
-    <include file="$(find jsk_perception)/sample/include/play_rosbag_pr2_self_see.xml" >
-      <arg name="rosbag_play_args" value="$(arg rosbag_play_args)" />
-    </include>
-    <param name="/use_sim_time" value="true" />
-  </group>
 
   <node name="$(arg MANAGER)"
         pkg="nodelet" type="nodelet"
