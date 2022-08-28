@@ -14,8 +14,7 @@ class PersonPoseArrayToPolygonArray(ConnectionBasedTransport):
 
     def __init__(self):
         super(PersonPoseArrayToPolygonArray, self).__init__()
-        self.is_camera_arrived = False
-        self.frame_id = None
+        self.frame_id = rospy.get_param("~frame_id", 'base_link')
 
 	self._tf_buffer = tf2_ros.Buffer(rospy.Duration(10))
         self._tf_listener = tf2_ros.TransformListener(self._tf_buffer)
@@ -26,22 +25,12 @@ class PersonPoseArrayToPolygonArray(ConnectionBasedTransport):
         self.pub = self.advertise('~output', PolygonArray, queue_size=1)
 
     def subscribe(self):
-        sub_pose = rospy.Subscriber('~input', PoseArray, self._cb_pose)
-        sub_info = rospy.Subscriber('~info', CameraInfo, self._cb_info,
-                                    queue_size=1, buff_size=2**24)
-        self.subs = [sub_pose, sub_info]
+        self.sub = rospy.Subscriber('~input', PoseArray, self._cb_pose)
 
     def unsubscribe(self):
-        for sub in self.subs:
-            sub.unregister()
-
-    def _cb_info(self, msg):
-        self.frame_id = msg.header.frame_id
-        self.is_camera_arrived = True
+        self.sub.unregister()
 
     def _cb_pose(self, msg):
-        if not self.is_camera_arrived:
-            return
         try:
             pykdl_transform_cam_to_laser = tf2_geometry_msgs.transform_to_kdl(
                 self._tf_buffer.lookup_transform(
@@ -70,14 +59,15 @@ class PersonPoseArrayToPolygonArray(ConnectionBasedTransport):
         if not position:
             return
 
-        p0 = Point32(x=position[0] - self.padding, y=position[1] - self.padding, z=position[2])
-        p1 = Point32(x=position[0] - self.padding, y=position[1] + self.padding, z=position[2])
-        p2 = Point32(x=position[0] + self.padding, y=position[1] + self.padding, z=position[2])
-        p3 = Point32(x=position[0] + self.padding, y=position[1] - self.padding, z=position[2])
+        p0 = Point32(x=position[0] - self.padding, y=position[1] - self.padding, 0)
+        p1 = Point32(x=position[0] - self.padding, y=position[1] + self.padding, 0)
+        p2 = Point32(x=position[0] + self.padding, y=position[1] + self.padding, 0)
+        p3 = Point32(x=position[0] + self.padding, y=position[1] - self.padding, 0)
         polygon_stamped_msg = PolygonStamped()
         polygon_stamped_msg.polygon.points = [p0, p1, p2, p3]
         polygon_array_msg = PolygonArray()
         polygon_array_msg.header = msg.header
+        polygon_array_msg.header.frame_id = self.frame_id
         polygon_array_msg.polygons.append(polygon_stamped_msg)
         self.pub.publish(polygon_array_msg)
 
