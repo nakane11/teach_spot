@@ -2,13 +2,7 @@
   <arg name="addpose_topic" default="/follow_waypoints/initialpose"/>
   <arg name="posearray_topic" default="/waypoints"/>
 
-  <param name="/use_sim_time" value="true" />
-  <param name="robot_description" textfile="$(find fetch_description)/robots/fetch.urdf" />
-
-  <node name="rosbag_play"
-        pkg="rosbag" type="play"
-        args="/home/nakane/teach_spot_20220629-212524.bag --clock --loop">
-  </node>
+  <include file="$(find teach_spot)/sample/include/play_rosbag_teachspot_fetch.xml" />
 
   <node name="speech_to_roman"
         pkg="teach_spot" type="speech_to_roman.py" >

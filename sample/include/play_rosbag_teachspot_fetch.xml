@@ -1,0 +1,10 @@
+<launch>
+  <param name="/use_sim_time" value="true" />
+  <param name="robot_description" textfile="$(find fetch_description)/robots/fetch.urdf" />
+  
+  <node name="rosbag_play"
+        pkg="rosbag" type="play"
+        args="$(find teach_spot)/sample/data/teach_spot_20220629-212524.bag --clock --loop">
+  </node>
+
+</launch>

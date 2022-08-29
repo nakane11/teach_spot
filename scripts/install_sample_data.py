@@ -14,6 +14,14 @@ def main():
         extract=False,
     )
 
+    download_data(
+        pkg_name=PKG,
+        path='sample/data/teach_spot_20220629-212524.bag',
+        url='https://drive.google.com/uc?id=1UFQB8Fo95_Laum0hP6bx9lFXVYQ72YjS',
+        md5='59944c76f342ddae3dfb67bde5ae4a5c',
+        extract=False,
+    )
+
 if __name__ == '__main__':
     main()
     
