@@ -32,7 +32,7 @@ class PersonPoseArrayToPolygonArray(ConnectionBasedTransport):
 
     def _cb_pose(self, msg):
         try:
-            pykdl_transform_cam_to_laser = tf2_geometry_msgs.transform_to_kdl(
+            pykdl_transform_base_to_laser = tf2_geometry_msgs.transform_to_kdl(
                 self._tf_buffer.lookup_transform(
                     self.frame_id,
                     msg.header.frame_id,
@@ -47,7 +47,7 @@ class PersonPoseArrayToPolygonArray(ConnectionBasedTransport):
         position = None
         for person in msg.poses:
             x, y, z = person.position.x, person.position.y, person.position.z
-            x, y, z = pykdl_transform_cam_to_laser * PyKDL.Vector(
+            x, y, z = pykdl_transform_base_to_laser * PyKDL.Vector(
                 x, y, z)
             if y * (-1 if self._arm == "larm" else 1) > 0:
                 continue
