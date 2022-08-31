@@ -12,7 +12,7 @@
   <arg name="input_depth_image" value="/kinect_head/depth_registered/hw_registered/image_rect" />
   <arg name="input_pose_array" value="/edgetpu_human_pose_estimator/output/poses" />
 
-  <arg name="manager_name" default="hand_navigation_pr2_manager" />
+  <arg name="manager_name" default="filter_manager" />
   <arg name="manager" default="/$(arg manager_name)" />
 
   <node name="$(arg manager_name)"
@@ -23,10 +23,12 @@
         pkg="teach_spot" type="set_params_pr2.py"
         output="screen" />
 
-  <node pkg="roseus" type="roseus" name="change_footprint"
-        args="$(find teach_spot)/euslisp/pr2-footprint.l" >
-    <param name="arm" value="$(arg arm)"/>
-  </node>
+  <!-- <node pkg="roseus" type="roseus" name="change_footprint" -->
+  <!--       args="$(find teach_spot)/euslisp/pr2-footprint.l" > -->
+  <!--   <param name="arm" value="$(arg arm)"/> -->
+  <!-- </node> -->
+
+  <include file="$(find teach_spot)/launch/dynamic_footprint.launch" />
 
   <node name="dr_spaam_lidar_person_detection"
         pkg="jsk_perception" type="lidar_person_detection_node.py"
@@ -51,6 +53,27 @@
   <!--   <rosparam subst_value="true"> -->
   <!--     approximate_sync: true -->
   <!--     queue_size: 100 -->
+  <!--   </rosparam> -->
+  <!-- </node> -->
+
+  <!-- <node name="person_pose_array_to_mask" output="screen" -->
+  <!--       pkg="teach_spot" type="person_pose_array_to_mask.py"> -->
+  <!--   <remap from="~input" to="/dr_spaam_lidar_person_detection/output" /> -->
+  <!--   <remap from="~input/info" to="/virtual_camera_mono/camera_info" /> -->
+  <!--   <rosparam> -->
+  <!--     target_arm: $(arg arm) -->
+  <!--     padding: 0.2 -->
+  <!--   </rosparam> -->
+  <!-- </node> -->
+
+  <!-- <node name="multiply_mask_image" -->
+  <!--       pkg="nodelet" type="nodelet" -->
+  <!--       args="load jsk_perception/MultiplyMaskImage $(arg manager)" -->
+  <!--       respawn="true" > -->
+  <!--   <remap from="~input/src1" to="/person_pose_array_to_mask/output" /> -->
+  <!--   <remap from="~input/src2" to="/robot_to_mask_image/output" /> -->
+  <!--   <rosparam> -->
+  <!--     approximate_sync: true -->
   <!--   </rosparam> -->
   <!-- </node> -->
 
