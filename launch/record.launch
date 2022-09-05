@@ -1,0 +1,13 @@
+<launch>
+
+  <arg name="rosbag" />
+
+  <include file="$(find jsk_fetch_startup)/launch/rosbag_record.launch" >
+    <arg name="rosbag" value="$(arg rosbag)" />
+    <arg name="other_topics" value="/rviz/image/compressed
+                                    /dual_fisheye_to_panorama/output
+				    /dr_spaam_lidar_person_detection/output
+				    /dr_spaam_lidar_person_detection/output/markers
+				    " />
+  </include>
+</launch>
