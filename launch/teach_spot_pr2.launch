@@ -24,6 +24,11 @@
         pkg="teach_spot" type="speech_to_roman.py" >
     <remap from="~output" to="/Tablet/voice_roman" />
   </node>
+
+  <node name="speech_to_hand"
+        pkg="robothand" type="speech_to_hand.py" >
+    <remap from="~input" to="/Tablet/voice_roman" />
+  </node>
   
   <group if="$(arg pull_arm)" >
     <include file="$(find virtual_force_drag)/launch/pr2_virtual_force_drag.launch" >

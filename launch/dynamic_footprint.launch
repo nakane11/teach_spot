@@ -143,10 +143,10 @@
               'm.polygon'
               --wait-for-start"/>
 
-  <node name="set_footprint_topic" unless="$(arg rosbag)"
-        pkg="teach_spot" type="set_footprint_topic_pr2.py"
-        output="screen">
-  </node>
+  <!-- <node name="set_footprint_topic" unless="$(arg rosbag)" -->
+  <!--       pkg="teach_spot" type="set_footprint_topic_pr2.py" -->
+  <!--       output="screen"> -->
+  <!-- </node> -->
 
   <group if="$(arg gui)">
     <node name="rviz"
