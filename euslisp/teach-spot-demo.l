@@ -51,8 +51,12 @@
 ;;     (cons x y)
 ;;     ))
 
+(defmethod a*-graph-search-solver
+  (:hn (n p)
+       (coords-difference (send n :get coords) (send (send p :goal-state) :get :coords))))
+
 (defclass teach-spot
-    :slots (label mode spot-msg spot-graph spot-list path prev-n goal-n goal-name sol))
+  :slots (label mode spot-msg spot-graph spot-list path prev-n goal-n goal-name sol))
 
 (defmethod teach-spot
     (:init ()
@@ -60,6 +64,7 @@
      (setq mode :record)
      (setq spot-graph (instance graph :init))
      (setq sol (instance breadth-first-graph-search-solver :init))
+     ;; (setq sol (instance a*-graph-search-solver :init spot-graph))
      (setq client (instance ros::simple-action-client :init "waypoints_action" follow_waypoints::WaypointsAction))
      ;; (send client :wait-for-server)
      (ros::subscribe "/Tablet/voice_roman" speech_recognition_msgs::SpeechRecognitionCandidates #'send self :voice-cb)
@@ -170,9 +175,9 @@
                   (setq prev-n nil)
                   (setq spot-list nil))
 
-                 ((substringp "に行こう" text)
+                 ((substringp "に連れて行って" text)
                   (send *ri* :speak-jp "はい")
-                  (setq goal-name (my-string-right-trim "niikou" roman-text))
+                  (setq goal-name (my-string-right-trim "nitsureteitte" roman-text))
                   (setq goal-n (send spot-graph :node goal-name))
                   (ros::ros-info "goal-node: ~A" (send goal-n :name))
                   (when goal-n
