@@ -28,7 +28,9 @@
   <!--   <param name="arm" value="$(arg arm)"/> -->
   <!-- </node> -->
 
-  <include file="$(find teach_spot)/launch/dynamic_footprint.launch" />
+  <include file="$(find teach_spot)/launch/dynamic_footprint.launch" >
+    <arg name="gui" value="false" />
+  </include>
 
   <node name="dr_spaam_lidar_person_detection"
         pkg="jsk_perception" type="lidar_person_detection_node.py"
