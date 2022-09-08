@@ -17,6 +17,7 @@
     <rosparam subst_value="true">
       frame_id: base_link
       child_frame_id: $(arg virtual_camera_frame)
+      queue_size: 100
       initial_pos: [0.0, 0.0, $(arg camera_height)]
       initial_rot: [0.0, 1.0, 0.0, 0.0]
     </rosparam>
