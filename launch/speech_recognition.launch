@@ -30,14 +30,23 @@
     </node>
   </group>
 
+  <group ns="sound_play" >
+    <node name="is_speaking"
+          pkg="sound_play" type="is_speaking.py" >
+      <remap from="~robotsound" to="status" />
+      <remap from="~output/is_speaking" to="is_speaking" />
+    </node>
+  </group>
+
   <node name="boolean_node_for_speaking"
         pkg="jsk_topic_tools" type="boolean_node.py"
         clear_params="true" >
     <remap from="~input1" to="/robotsound/is_speaking" />
     <remap from="~input2" to="/robotsound_jp/is_speaking" />
+    <remap from="~input3" to="/sound_play/is_speaking" />
     <remap from="~output/or" to="/is_speaking" />
     <rosparam>
-      number_of_input: 2
+      number_of_input: 3
     </rosparam>
   </node>
 
