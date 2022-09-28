@@ -1,0 +1,142 @@
+<launch>
+  <arg name="gui" default="true" />
+  <arg name="INPUT_IMAGE" default="/head_camera/rgb/image_rect_color" />
+  <arg name="MANAGER" default="sample_manager" />
+  <arg name="camera_height" default="5.0" />
+  <arg name="virtual_camera_frame" default="virtual_camera_frame" />
+
+  <node name="$(arg MANAGER)"
+        pkg="nodelet" type="nodelet"
+        args="manager"/>
+
+  <node name="virtual_camera_mono"
+        pkg="jsk_perception" type="virtual_camera_mono"
+        output="screen"
+        clear_params="true">
+    <remap from="image" to="$(arg INPUT_IMAGE)"/>
+    <rosparam subst_value="true">
+      frame_id: base_link
+      child_frame_id: $(arg virtual_camera_frame)
+      queue_size: 100
+      initial_pos: [0.0, 0.0, $(arg camera_height)]
+      initial_rot: [0.0, 1.0, 0.0, 0.0]
+    </rosparam>
+  </node>
+
+  <node name="info_to_depth_image"
+        pkg="teach_spot" type="info_to_depth_image.py">
+    <remap from="~input" to="/virtual_camera_mono/camera_info"/>
+    <rosparam subst_value="true">
+      frame_height: $(arg camera_height)
+    </rosparam>
+  </node>
+
+  <node name="robot_to_mask_image"
+        pkg="nodelet" type="nodelet"
+        args="standalone jsk_perception/RobotToMaskImage"
+        output="screen">
+    <!-- args="load jsk_perception/RobotToMaskImage $(arg MANAGER)" > -->
+    <remap from="~input/camera_info" to="/virtual_camera_mono/camera_info"/>
+      <rosparam>
+      self_see_links:
+        - name: base_link
+        - name: torso_lift_link
+        - name: shoulder_pan_link
+        - name: shoulder_lift_link
+        - name: upperarm_roll_link
+        - name: elbow_flex_link
+        - name: forearm_roll_link
+        - name: wrist_flex_link
+        - name: wrist_roll_link
+        - name: gripper_link
+        - name: l_gripper_finger_link
+        - name: r_gripper_finger_link
+      self_see_default_padding: 0.0
+    </rosparam>
+  </node>
+
+  <node name="apply_mask_image"
+        pkg="nodelet" type="nodelet"
+        args="standalone jsk_perception/ApplyMaskImage $(arg MANAGER)" >
+    <remap from="~input" to="/info_to_depth_image/output" />
+    <remap from="~input/mask" to="/robot_to_mask_image/output" />
+    <rosparam>
+      approximate_sync: true
+      negative: true
+      clip: false
+    </rosparam>
+  </node>
+
+  <node pkg="nodelet" type="nodelet" name="depth_image_to_pointcloud"
+        args="standalone depth_image_proc/point_cloud_xyz $(arg MANAGER)">
+    <remap from="/apply_mask_image/camera_info" to="/virtual_camera_mono/camera_info"/>
+    <remap from="image_rect" to="/apply_mask_image/output"/>
+    <remap from="points" to="/robot_footpoints"/>
+    <rosparam>
+      queue_size: 100
+    </rosparam>
+  </node>
+
+  <node name="organized_multi_plane_segmentation"
+        pkg="nodelet" type="nodelet"
+        args="standalone jsk_pcl/OrganizedMultiPlaneSegmentation $(arg MANAGER)"
+        clear_params="true">
+    <remap from="~input" to="/robot_footpoints"/>
+    <rosparam>
+      publish_normal: true
+      min_size: 1
+      distance_threashold: 0.3
+    </rosparam>
+  </node>
+
+  <node name="polygon_array_transformer"
+        pkg="nodelet" type="nodelet"
+        args="standalone jsk_pcl_utils/PolygonArrayTransformer $(arg MANAGER)" >
+    <remap from="~input_polygons" to="/organized_multi_plane_segmentation/output_nonconnected_polygon"/>
+    <remap from="~input_coefficients" to="/organized_multi_plane_segmentation/output_nonconnected_coefficients"/>
+    <remap from="~output_polygons" to="/robot_polygon"/>
+    <rosparam>
+      frame_id: base_link
+    </rosparam>
+  </node>
+  
+  <node name="person_pose_array_to_polygon_array"
+        pkg="teach_spot" type="person_pose_array_to_polygon_array.py">
+    <remap from="~input" to="/dr_spaam_lidar_person_detection/output"/>
+    <remap from="~output" to="/human_polygon"/>
+    <rosparam subst_value="true">
+      frame_id: base_link
+      target_arm: larm
+      padding: 0.2
+    </rosparam>
+  </node>
+
+  <node name="concave_hull_polygon"
+        pkg="teach_spot" type="concave_hull_polygon.py">
+    <remap from="~input1" to="/human_polygon"/>
+    <remap from="~input2" to="/robot_polygon"/>
+    <rosparam subst_value="true">
+      frame_id: base_link
+      number_of_input: 2
+    </rosparam>
+  </node>
+  
+  <node name="polygon_stamped_to_polygon"
+        pkg="topic_tools" type="transform"
+        args="/concave_hull_polygon/output /dynamic_footprint geometry_msgs/Polygon
+              'm.polygon'
+              --wait-for-start"/>
+
+  <!-- <node name="set_footprint_topic" unless="$(arg rosbag)" -->
+  <!--       pkg="teach_spot" type="set_footprint_topic_pr2.py" -->
+  <!--       output="screen"> -->
+  <!-- </node> -->
+
+  <group if="$(arg gui)">
+    <node name="rviz"
+          pkg="rviz" type="rviz"
+          args="-d $(find teach_spot)/launch/config/dynamic_footprint.rviz">
+    </node>
+  </group>
+  
+</launch>
