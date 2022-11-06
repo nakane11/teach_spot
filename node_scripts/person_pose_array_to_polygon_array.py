@@ -15,13 +15,14 @@ class PersonPoseArrayToPolygonArray(ConnectionBasedTransport):
     def __init__(self):
         super(PersonPoseArrayToPolygonArray, self).__init__()
         self.frame_id = rospy.get_param("~frame_id", 'base_link')
+        self._x_offset = rospy.get_param("~x_offset", 0.2)
 
 	self._tf_buffer = tf2_ros.Buffer(rospy.Duration(10))
         self._tf_listener = tf2_ros.TransformListener(self._tf_buffer)
 
         self._arm = rospy.get_param("~target_arm", "larm")
         self._duration_timeout = rospy.get_param("~timeout", 3.0)
-        self.padding = rospy.get_param("~padding", 0.2)
+        self.padding = rospy.get_param("~padding", 0.12)
         self.pub = self.advertise('~output', PolygonArray, queue_size=1)
 
     def subscribe(self):
@@ -61,10 +62,10 @@ class PersonPoseArrayToPolygonArray(ConnectionBasedTransport):
         polygon_array_msg.header.frame_id = self.frame_id
 
         if position:
-            p0 = Point32(x=position[0] - self.padding, y=position[1] - self.padding, z=0)
-            p1 = Point32(x=position[0] - self.padding, y=position[1] + self.padding, z=0)
-            p2 = Point32(x=position[0] + self.padding, y=position[1] + self.padding, z=0)
-            p3 = Point32(x=position[0] + self.padding, y=position[1] - self.padding, z=0)
+            p0 = Point32(x=self.x_offset + position[0] - self.padding, y=position[1] - self.padding, z=0)
+            p1 = Point32(x=self.x_offset + position[0] - self.padding, y=position[1] + self.padding, z=0)
+            p2 = Point32(x=self.x_offset + position[0] + self.padding, y=position[1] + self.padding, z=0)
+            p3 = Point32(x=self.x_offset + position[0] + self.padding, y=position[1] - self.padding, z=0)
             polygon_stamped_msg = PolygonStamped()
             polygon_stamped_msg.header.frame_id = self.frame_id
             polygon_stamped_msg.polygon.points = [p0, p1, p2, p3]

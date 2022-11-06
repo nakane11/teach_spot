@@ -17,6 +17,7 @@ class PersonPoseArrayToBoxes(ConnectionBasedTransport):
         super(PersonPoseArrayToBoxes, self).__init__()
         self._arm = rospy.get_param("~target_arm", "larm")
         self._duration_timeout = rospy.get_param("~timeout", 3.0)
+        self._x_offset = rospy.get_param("~x_offset", 0.2)
 
 	self._tf_buffer = tf2_ros.Buffer(rospy.Duration(10))
         self._tf_listener = tf2_ros.TransformListener(self._tf_buffer)
@@ -62,7 +63,7 @@ class PersonPoseArrayToBoxes(ConnectionBasedTransport):
 
         for pose in pose_array:
             bbox_msg = BoundingBox(header=header)
-            bbox_msg.pose.position.x = pose[0]
+            bbox_msg.pose.position.x = pose[0] + self._x_offset
             bbox_msg.pose.position.y = pose[1]
             bbox_msg.pose.position.z = 1.0
             bbox_msg.pose.orientation.x = 0
