@@ -71,6 +71,7 @@ class SetParams():
         rospy.loginfo("Restore move_base parameters")
         for param, topic in zip(self.params, self.move_base_topics):
             rospy.set_param(param, topic)
+        self.delete_params()
         self.kill_move_base()
 
     def delete_params(self):
