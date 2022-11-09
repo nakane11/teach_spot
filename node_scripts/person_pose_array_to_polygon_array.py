@@ -15,7 +15,7 @@ class PersonPoseArrayToPolygonArray(ConnectionBasedTransport):
     def __init__(self):
         super(PersonPoseArrayToPolygonArray, self).__init__()
         self.frame_id = rospy.get_param("~frame_id", 'base_link')
-        self._x_offset = rospy.get_param("~x_offset", 0.2)
+        self.x_offset = rospy.get_param("~x_offset", 0.2)
 
 	self._tf_buffer = tf2_ros.Buffer(rospy.Duration(10))
         self._tf_listener = tf2_ros.TransformListener(self._tf_buffer)
