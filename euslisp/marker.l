@@ -129,11 +129,12 @@
                :markers
                (flatten
                 (mapcar #'(lambda (spot)
-                            (make-pin-marker (car spot) (cdr spot)
+                            (make-pin-marker (car spot) (cadr spot)
                                              header (incf id)
                                              :alpha alpha
                                              :lifetime lifetime
-                                             :action ac)) spots))))))
+                                             :action ac
+                                             :color (caddr spot))) spots))))))
 
 (defun make-line-list-marker (coords1 coords2 header id
                         &key (alpha 1.0) (lifetime 15) ((:action ac) 0) color)
