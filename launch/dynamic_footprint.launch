@@ -113,7 +113,7 @@
     <remap from="~input_coefficients" to="organized_multi_plane_segmentation/output_nonconnected_coefficients"/>
     <remap from="~output_polygons" to="robot_polygon"/>
     <rosparam>
-      frame_id: base_link
+      frame_id: base_converted
     </rosparam>
   </node>
   
@@ -122,7 +122,7 @@
     <remap from="~input" to="/dr_spaam_lidar_person_detection/output"/>
     <remap from="~output" to="human_polygon"/>
     <rosparam subst_value="true">
-      frame_id: base_link
+      frame_id: base_converted
       target_arm: larm
       padding: 0.2
     </rosparam>
@@ -133,14 +133,14 @@
     <remap from="~input1" to="human_polygon"/>
     <remap from="~input2" to="robot_polygon"/>
     <rosparam subst_value="true">
-      frame_id: base_link
+      frame_id: base_converted
       number_of_input: 2
     </rosparam>
   </node>
   
   <node name="polygon_stamped_to_polygon"
         pkg="topic_tools" type="transform"
-        args="concave_hull_polygon/output dynamic_footprint geometry_msgs/Polygon
+        args="/concave_hull_polygon/output /dynamic_footprint geometry_msgs/Polygon
               'm.polygon'
               --wait-for-start"/>
 

@@ -27,7 +27,7 @@
 
   <node name="dr_spaam_lidar_person_detection"
         pkg="jsk_perception" type="lidar_person_detection_node.py"
-        output="screen">
+        output="screen" machine="c2">
     <remap from="~input" to="/base_scan" />
     <rosparam subst_value="true" >
       map_link: /map
