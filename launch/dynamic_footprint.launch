@@ -1,13 +1,13 @@
 <launch>
   <arg name="gui" default="true" />
   <arg name="INPUT_IMAGE" default="/kinect_head/rgb/image_rect_color" />
-  <arg name="MANAGER" default="sample_manager" />
+  <arg name="MANAGER" default="/kinect_head/kinect_head_c2_nodelet_manager" />
   <arg name="camera_height" default="5.0" />
   <arg name="virtual_camera_frame" default="virtual_camera_frame" />
 
-  <node name="$(arg MANAGER)"
-        pkg="nodelet" type="nodelet"
-        args="manager"/>
+  <!-- <node name="$(arg MANAGER)" -->
+  <!--       pkg="nodelet" type="nodelet" -->
+  <!--       args="manager"/> -->
 
   <node name="virtual_camera_mono"
         pkg="jsk_perception" type="virtual_camera_mono"
@@ -33,7 +33,7 @@
 
   <node name="robot_to_mask_image"
         pkg="nodelet" type="nodelet"
-        args="standalone jsk_perception/RobotToMaskImage"
+        args="load jsk_perception/RobotToMaskImage $(arg MANAGER)"
         output="screen">
     <!-- args="load jsk_perception/RobotToMaskImage $(arg MANAGER)" > -->
     <remap from="~input/camera_info" to="virtual_camera_mono/camera_info"/>
@@ -74,7 +74,7 @@
 
   <node name="apply_mask_image"
         pkg="nodelet" type="nodelet"
-        args="standalone jsk_perception/ApplyMaskImage $(arg MANAGER)" >
+        args="load jsk_perception/ApplyMaskImage $(arg MANAGER)" >
     <remap from="~input" to="info_to_depth_image/output" />
     <remap from="~input/mask" to="robot_to_mask_image/output" />
     <rosparam>
@@ -85,7 +85,7 @@
   </node>
 
   <node pkg="nodelet" type="nodelet" name="depth_image_to_pointcloud"
-        args="standalone depth_image_proc/point_cloud_xyz $(arg MANAGER)">
+        args="load depth_image_proc/point_cloud_xyz $(arg MANAGER)">
     <remap from="apply_mask_image/camera_info" to="virtual_camera_mono/camera_info"/>
     <remap from="image_rect" to="apply_mask_image/output"/>
     <remap from="points" to="robot_footpoints"/>
@@ -96,7 +96,7 @@
 
   <node name="organized_multi_plane_segmentation"
         pkg="nodelet" type="nodelet"
-        args="standalone jsk_pcl/OrganizedMultiPlaneSegmentation $(arg MANAGER)"
+        args="load jsk_pcl/OrganizedMultiPlaneSegmentation $(arg MANAGER)"
         clear_params="true">
     <remap from="~input" to="robot_footpoints"/>
     <rosparam>
@@ -108,7 +108,7 @@
 
   <node name="polygon_array_transformer"
         pkg="nodelet" type="nodelet"
-        args="standalone jsk_pcl_utils/PolygonArrayTransformer $(arg MANAGER)" >
+        args="load jsk_pcl_utils/PolygonArrayTransformer $(arg MANAGER)" >
     <remap from="~input_polygons" to="organized_multi_plane_segmentation/output_nonconnected_polygon"/>
     <remap from="~input_coefficients" to="organized_multi_plane_segmentation/output_nonconnected_coefficients"/>
     <remap from="~output_polygons" to="robot_polygon"/>

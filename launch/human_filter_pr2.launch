@@ -10,12 +10,12 @@
   <arg name="input_depth_image" value="/kinect_head/depth_registered/hw_registered/image_rect" />
   <arg name="input_pose_array" value="/edgetpu_human_pose_estimator/output/poses" />
 
-  <arg name="manager_name" default="filter_manager" />
-  <arg name="manager" default="/$(arg manager_name)" />
-
-  <node name="$(arg manager_name)"
-        pkg="nodelet" type="nodelet"
-        args="manager"/>
+  <!-- <arg name="manager_name" default="filter_manager" /> -->
+  <!-- <arg name="manager" default="/$(arg manager_name)" /> -->
+  <arg name="manager" default="/kinect_head/kinect_head_c2_nodelet_manager" />
+  <!-- <node name="$(arg manager_name)" -->
+  <!--       pkg="nodelet" type="nodelet" -->
+  <!--       args="manager"/> -->
 
   <node name="set_params"
         pkg="teach_spot" type="set_params_pr2.py"
@@ -24,6 +24,8 @@
   <include file="$(find teach_spot)/launch/dynamic_footprint.launch" >
     <arg name="gui" value="false" />
   </include>
+
+  <include file="$(find pr2_machine)/pr2.machine" />
 
   <node name="dr_spaam_lidar_person_detection"
         pkg="jsk_perception" type="lidar_person_detection_node.py"
