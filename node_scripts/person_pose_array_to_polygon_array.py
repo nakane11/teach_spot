@@ -21,7 +21,7 @@ class PersonPoseArrayToPolygonArray(ConnectionBasedTransport):
         self._tf_listener = tf2_ros.TransformListener(self._tf_buffer)
 
         self._arm = rospy.get_param("~target_arm", "larm")
-        self._duration_timeout = rospy.get_param("~timeout", 3.0)
+        self._duration_timeout = rospy.get_param("~timeout", 6.0)
         self.padding = rospy.get_param("~padding", 0.12)
         self.pub = self.advertise('~output', PolygonArray, queue_size=1)
 
@@ -52,7 +52,7 @@ class PersonPoseArrayToPolygonArray(ConnectionBasedTransport):
                 x, y, z)
             if y * (-1 if self._arm == "larm" else 1) > 0:
                 continue
-            if np.sqrt(x ** 2 + y ** 2) > 1.0:
+            if np.sqrt(x ** 2 + y ** 2) > 1.2:
                 continue
             position = (x, y, z)
             break

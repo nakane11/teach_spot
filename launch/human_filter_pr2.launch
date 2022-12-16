@@ -3,8 +3,6 @@
   <arg name="gui" default="false" />
   <arg name="gpu" default="-1" />
   <arg name="arm" default="larm" />
-  <!-- <arg name="input_cloud" value="/kinect_head/depth_registered/points" /> -->
-  <!-- <arg name="input_cloud" value="/kinect_head/depth_registered/quater/points" /> -->
   <arg name="input_base_scan" value="/base_scan_filtered" />
   <arg name="input_tilt_scan" value="/tilt_scan_filtered/navigation" />
 
@@ -23,61 +21,25 @@
         pkg="teach_spot" type="set_params_pr2.py"
         output="screen" />
 
-  <!-- <node pkg="roseus" type="roseus" name="change_footprint" -->
-  <!--       args="$(find teach_spot)/euslisp/pr2-footprint.l" > -->
-  <!--   <param name="arm" value="$(arg arm)"/> -->
-  <!-- </node> -->
-
   <include file="$(find teach_spot)/launch/dynamic_footprint.launch" >
     <arg name="gui" value="false" />
   </include>
 
-  <!-- <node name="dr_spaam_lidar_person_detection" -->
-  <!--       pkg="jsk_perception" type="lidar_person_detection_node.py" -->
-  <!--       output="screen"> -->
-  <!--   <remap from="~input" to="/base_scan" /> -->
-  <!--   <rosparam subst_value="true" > -->
-  <!--     map_link: /map -->
-  <!--     weight_file: "$(find jsk_perception)/trained_data/lidar_person_detection/ckpt_jrdb_ann_dr_spaam_e20.pth" -->
-  <!--     detector_model: "DR-SPAAM" -->
-  <!--     conf_thresh: 0.8 -->
-  <!--     stride: 1 -->
-  <!--     panoramic_scan: false -->
-  <!--     gpu: $(arg gpu) -->
-  <!--   </rosparam> -->
-  <!-- </node> -->
+  <node name="dr_spaam_lidar_person_detection"
+        pkg="jsk_perception" type="lidar_person_detection_node.py"
+        output="screen">
+    <remap from="~input" to="/base_scan" />
+    <rosparam subst_value="true" >
+      map_link: /map
+      weight_file: "$(find jsk_perception)/trained_data/lidar_person_detection/ckpt_jrdb_ann_dr_spaam_e20.pth"
+      detector_model: "DR-SPAAM"
+      conf_thresh: 0.8
+      stride: 1
+      panoramic_scan: false
+      gpu: -1
+    </rosparam>
+  </node>
 
-  <!-- <node name="people_pose_2d_to_3d" -->
-  <!--       pkg="teach_spot" type="people_pose_2d_to_3d.py" > -->
-  <!--   <remap from="~input/pose" to="$(arg input_pose_array)" /> -->
-  <!--   <remap from="~input/info" to="$(arg input_camera_info)" /> -->
-  <!--   <remap from="~input/depth" to="$(arg input_depth_image)" /> -->
-  <!--   <rosparam subst_value="true"> -->
-  <!--     approximate_sync: true -->
-  <!--     queue_size: 100 -->
-  <!--   </rosparam> -->
-  <!-- </node> -->
-
-  <!-- <node name="person_pose_array_to_mask" output="screen" -->
-  <!--       pkg="teach_spot" type="person_pose_array_to_mask.py"> -->
-  <!--   <remap from="~input" to="/dr_spaam_lidar_person_detection/output" /> -->
-  <!--   <remap from="~input/info" to="/virtual_camera_mono/camera_info" /> -->
-  <!--   <rosparam> -->
-  <!--     target_arm: $(arg arm) -->
-  <!--     padding: 0.2 -->
-  <!--   </rosparam> -->
-  <!-- </node> -->
-
-  <!-- <node name="multiply_mask_image" -->
-  <!--       pkg="nodelet" type="nodelet" -->
-  <!--       args="load jsk_perception/MultiplyMaskImage $(arg manager)" -->
-  <!--       respawn="true" > -->
-  <!--   <remap from="~input/src1" to="/person_pose_array_to_mask/output" /> -->
-  <!--   <remap from="~input/src2" to="/robot_to_mask_image/output" /> -->
-  <!--   <rosparam> -->
-  <!--     approximate_sync: true -->
-  <!--   </rosparam> -->
-  <!-- </node> -->
 
   <node name="person_pose_array_to_boxes"
         pkg="teach_spot" type="person_pose_array_to_boxes.py">
@@ -119,6 +81,24 @@
           pkg="topic_tools" type="mux"
           args="$(arg input_base_scan)_mux /base_scan_filtered_non_human $(arg input_base_scan)" >
       <remap from="mux" to="pointcloud_mux"/>
+    </node>
+
+    <node name="mux_to_scan"
+          pkg="pointcloud_to_laserscan" type="pointcloud_to_laserscan_node"
+          respawn="true" output="screen">
+      <remap from="cloud_in" to="/base_scan_filtered_non_human"/>
+      <remap from="scan" to="$(arg input_base_scan)_mux/scan"/>
+      <rosparam>
+        min_height: 0.25
+        max_height: 0.35
+        angle_min: -2.26892805099
+        angle_max: 2.26456475258
+        angle_increment: 0.00436332309619
+        scan_time: 0.0500000007451
+        range_min: 0.023
+        range_max: 60.0
+        concurrency_level: 0
+      </rosparam>
     </node>
   </group>
 

@@ -16,7 +16,7 @@ class PersonPoseArrayToBoxes(ConnectionBasedTransport):
     def __init__(self):
         super(PersonPoseArrayToBoxes, self).__init__()
         self._arm = rospy.get_param("~target_arm", "larm")
-        self._duration_timeout = rospy.get_param("~timeout", 3.0)
+        self._duration_timeout = rospy.get_param("~timeout", 6.0)
         self._x_offset = rospy.get_param("~x_offset", 0.2)
 
 	self._tf_buffer = tf2_ros.Buffer(rospy.Duration(10))
@@ -53,7 +53,7 @@ class PersonPoseArrayToBoxes(ConnectionBasedTransport):
                 x, y, z)
             if y * (1 if self._arm == "larm" else -1) > 0:
                 continue
-            if np.sqrt(x ** 2 + y ** 2) > 1.0:
+            if np.sqrt(x ** 2 + y ** 2) > 1.2:
                 continue
             pose_array.append([x, y, z])
         
