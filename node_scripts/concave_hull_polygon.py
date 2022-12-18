@@ -5,6 +5,7 @@ from geometry_msgs.msg import PolygonStamped, Point32
 import rospy
 import alphashape
 from shapely.geometry.base import dump_coords
+import numpy as np
 
 class ConcaveHullPolygon(object):
 
@@ -54,8 +55,9 @@ class ConcaveHullPolygon(object):
             total_points.extend(self.data[i])
         alpha_shape = alphashape.alphashape(total_points, 2.0)
         vertices = dump_coords(alpha_shape)
-        for vertex in vertices:
-            p = Point32(x=vertex[0], y=vertex[1], z=0.0)
+        vertices = np.array(vertices).flatten().tolist()
+        for i in range(len(vertices)//2):
+            p = Point32(x=vertices[2*i], y=vertices[2*i+1], z=0.0)
             pub_msg.polygon.points.append(p)
         pub_msg.header.frame_id = self.frame_id
         pub_msg.header.stamp = rospy.Time.now()
