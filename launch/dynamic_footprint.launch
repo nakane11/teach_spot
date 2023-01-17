@@ -131,7 +131,8 @@
 
   <group ns="local_costmap" >
     <node name="concave_hull_polygon"
-          pkg="teach_spot" type="concave_hull_polygon.py">
+          pkg="teach_spot" type="concave_hull_polygon.py"
+	  output="screen" >
       <remap from="~input1" to="/human_polygon"/>
       <remap from="~input2" to="/robot_polygon"/>
       <rosparam subst_value="true">
@@ -142,14 +143,15 @@
 
     <node name="polygon_stamped_to_polygon"
           pkg="topic_tools" type="transform"
-          args="concave_hull_polygon/output dynamic_footprint geometry_msgs/Polygon
+          args="/local_costmap/concave_hull_polygon/output /local_costmap/dynamic_footprint geometry_msgs/Polygon
                 'm.polygon'
                 --wait-for-start"/>
   </group>
 
   <group ns="global_costmap" >
     <node name="concave_hull_polygon"
-          pkg="teach_spot" type="concave_hull_polygon.py">
+          pkg="teach_spot" type="concave_hull_polygon.py"
+	  output="screen" >
       <remap from="~input1" to="/human_polygon"/>
       <remap from="~input2" to="/robot_polygon"/>
       <rosparam subst_value="true">
@@ -160,7 +162,7 @@
 
     <node name="polygon_stamped_to_polygon"
           pkg="topic_tools" type="transform"
-          args="concave_hull_polygon/output dynamic_footprint geometry_msgs/Polygon
+          args="/global_costmap/concave_hull_polygon/output /global_costmap/dynamic_footprint geometry_msgs/Polygon
                 'm.polygon'
                 --wait-for-start"/>
   </group>
