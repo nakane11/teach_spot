@@ -62,8 +62,6 @@ class PersonTopicPublisher(ConnectionBasedTransport):
                 continue
             position = (x, y, z)
             break
-        if position is None:
-            return
         
         # PolygonArray
         polygon_array_msg = PolygonArray()
@@ -86,29 +84,31 @@ class PersonTopicPublisher(ConnectionBasedTransport):
         bbox_array_msg.header = msg.header
         bbox_array_msg.header.frame_id = self.frame_id
 
-        bbox_msg = BoundingBox(header=msg.header)
-        bbox_msg.pose.position.x = position[0] + self.x_offset
-        bbox_msg.pose.position.y = position[1]
-        bbox_msg.pose.position.z = 1.0
-        bbox_msg.pose.orientation.x = 0
-        bbox_msg.pose.orientation.y = 0
-        bbox_msg.pose.orientation.z = 0
-        bbox_msg.pose.orientation.w = 1
-        bbox_msg.dimensions.x = 0.7
-        bbox_msg.dimensions.y = 0.7
-        bbox_msg.dimensions.z = 2.0
-        bbox_array_msg.boxes.append(bbox_msg)
+        if position:
+            bbox_msg = BoundingBox(header=msg.header)
+            bbox_msg.pose.position.x = position[0] + self.x_offset
+            bbox_msg.pose.position.y = position[1]
+            bbox_msg.pose.position.z = 1.0
+            bbox_msg.pose.orientation.x = 0
+            bbox_msg.pose.orientation.y = 0
+            bbox_msg.pose.orientation.z = 0
+            bbox_msg.pose.orientation.w = 1
+            bbox_msg.dimensions.x = 0.7
+            bbox_msg.dimensions.y = 0.7
+            bbox_msg.dimensions.z = 2.0
+            bbox_array_msg.boxes.append(bbox_msg)
         self.box_pub.publish(bbox_array_msg)
 
         # PoseStamped
-        pose_stamped_msg = PoseStamped()
-        pose_stamped_msg.header = msg.header
-        pose_stamped_msg.header.frame_id = self.frame_id
-        pose_stamped_msg.pose.position.x = position[0] + self.x_offset
-        pose_stamped_msg.pose.position.y = position[1]
-        pose_stamped_msg.pose.position.z = 0.0
-        pose_stamped_msg.pose.orientation.w = 1.0
-        self.pose_pub.publish(pose_stamped_msg)
+        if position:
+            pose_stamped_msg = PoseStamped()
+            pose_stamped_msg.header = msg.header
+            pose_stamped_msg.header.frame_id = self.frame_id
+            pose_stamped_msg.pose.position.x = position[0] + self.x_offset
+            pose_stamped_msg.pose.position.y = position[1]
+            pose_stamped_msg.pose.position.z = 0.0
+            pose_stamped_msg.pose.orientation.w = 1.0
+            self.pose_pub.publish(pose_stamped_msg)
 
 if __name__ == '__main__':
     rospy.init_node('person_topic_publisher')
