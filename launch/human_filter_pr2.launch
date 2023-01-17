@@ -43,10 +43,10 @@
     </rosparam>
   </node>
 
-
-  <node name="person_pose_array_to_boxes"
-        pkg="teach_spot" type="person_pose_array_to_boxes.py">
+  <node name="person_topic_publisher"
+        pkg="teach_spot" type="person_topic_publisher.py">
     <remap from="~input" to="/dr_spaam_lidar_person_detection/output" />
+    <remap from="~output/polygon" to="/human_polygon" />
     <rosparam>
       target_arm: $(arg arm)
       base_frame_id: base_link
@@ -58,7 +58,7 @@
           pkg="nodelet" type="nodelet"
           args="load jsk_pcl/AttentionClipper $(arg manager)" >
       <remap from="~input/points" to="$(arg input_base_scan)" />
-      <remap from="~input/box_array" to="/person_pose_array_to_boxes/output" />
+      <remap from="~input/box_array" to="/person_topic_publisher/output/boxes" />
       <rosparam>
         use_multiple_attention: true
         negative: true
@@ -110,7 +110,7 @@
           pkg="nodelet" type="nodelet"
           args="load jsk_pcl/AttentionClipper $(arg manager)" >
       <remap from="~input/points" to="$(arg input_tilt_scan)" />
-      <remap from="~input/box_array" to="/person_pose_array_to_boxes/output" />
+      <remap from="~input/box_array" to="/person_topic_publisher/output/boxes" />
       <rosparam>
         use_multiple_attention: true
         negative: true

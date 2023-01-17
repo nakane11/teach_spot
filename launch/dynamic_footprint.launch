@@ -118,17 +118,6 @@
     </rosparam>
   </node>
   
-  <node name="person_pose_array_to_polygon_array"
-        pkg="teach_spot" type="person_pose_array_to_polygon_array.py">
-    <remap from="~input" to="/dr_spaam_lidar_person_detection/output"/>
-    <remap from="~output" to="human_polygon"/>
-    <rosparam subst_value="true">
-      frame_id: base_converted
-      target_arm: larm
-      padding: 0.2
-    </rosparam>
-  </node>
-
   <group ns="local_costmap" >
     <node name="concave_hull_polygon"
           pkg="teach_spot" type="concave_hull_polygon.py"
