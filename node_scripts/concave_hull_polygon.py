@@ -72,7 +72,7 @@ class ConcaveHullPolygon(object):
             total_points.extend(self.data[i])
         alpha_shape = alphashape.alphashape(total_points, 2.0)
         vertices = dump_coords(alpha_shape)
-        vertices = np.array(vertices).flatten().tolist()
+        vertices = np.concatenate(vertices).tolist()
         for i in range(len(vertices)//2):
             p = Point32(x=vertices[2*i], y=vertices[2*i+1], z=0.0)
             pub_msg.polygon.points.append(p)
