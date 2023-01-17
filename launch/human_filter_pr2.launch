@@ -39,6 +39,7 @@
       stride: 1
       panoramic_scan: false
       gpu: -1
+      queue_size: 1
     </rosparam>
   </node>
 
