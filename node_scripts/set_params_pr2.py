@@ -18,7 +18,9 @@ class SetParams():
         self.footprint_params = ["/move_base_node/global_costmap/footprint_topic",
                        "/move_base_node/local_costmap/footprint_topic",
                        "/safe_teleop_base/local_costmap/footprint_topic"]
-        self.footprint_name = "/dynamic_footprint"
+        self.footprint_topics = ["/global_costmap/dynamic_footprint",
+                                 "/local_costmap/dynamic_footprint",
+                                 "/local_costmap/dynamic_footprint"]
 
         # self.set_default_params()
         rospy.on_shutdown(self.restore_params)
@@ -63,8 +65,8 @@ class SetParams():
         rospy.loginfo("Set move_base parameters")
         for param, topic in zip(self.params, self.mux_topics):
             rospy.set_param(param, topic)
-        for param in self.footprint_params:
-            rospy.set_param(param, self.footprint_name)
+        for param, topic in zip(self.footprint_params, self.footprint_topics):
+            rospy.set_param(param, topic)
         self.kill_move_base()
         
     def restore_params(self):

@@ -6,6 +6,9 @@ import rospy
 import alphashape
 from shapely.geometry.base import dump_coords
 import numpy as np
+import PyKDL
+import tf2_geometry_msgs
+import tf2_ros
 
 class ConcaveHullPolygon(object):
 
@@ -15,10 +18,13 @@ class ConcaveHullPolygon(object):
         if self.n_input <= 0:
             rospy.logerr('~number_of_input should be greater than 0.')
             sys.exit(1)
+	self._tf_buffer = tf2_ros.Buffer(rospy.Duration(10))
+        self._tf_listener = tf2_ros.TransformListener(self._tf_buffer)
         self.pub = rospy.Publisher('~output', PolygonStamped, queue_size=1)
         self.subs = {}
         self.data = {}
-        self.frame_id = rospy.get_param('~frame_id', None)
+        self._duration_timeout = rospy.get_param("~timeout", 6.0)
+        self.frame_id = rospy.get_param('~frame_id', 'base_link')
         self.subscribe()
         rate = rospy.get_param('~rate', 100)
         if rate == 0:
@@ -36,14 +42,25 @@ class ConcaveHullPolygon(object):
             self.subs[topic_name] = sub
 
     def callback(self, topic_name, msg):
-        if self.frame_id is not None:
-            if msg.header.frame_id != self.frame_id:
-                rospy.logwarn('frame_id of input PolygonArray should be {}'.format(self.frame_id))
-                return
         points = []
         for polygon_stamped in msg.polygons:
+            try:
+                pykdl_transform = tf2_geometry_msgs.transform_to_kdl(
+                    self._tf_buffer.lookup_transform(
+                        self.frame_id,
+                        msg.header.frame_id,
+                        msg.header.stamp,
+                        timeout=rospy.Duration(self._duration_timeout)))
+            except (tf2_ros.LookupException,
+                    tf2_ros.ConnectivityException,
+                    tf2_ros.ExtrapolationException) as e:
+                rospy.logwarn('{}'.format(e))
+                return
+
             for point in polygon_stamped.polygon.points:
-                points.append([point.x, point.y])
+                x, y, z = pykdl_transform * PyKDL.Vector(
+                    point.x, point.y, 0)
+                points.append([x, y])
         self.data[topic_name] = points
 
     def timer_cb(self, timer):
