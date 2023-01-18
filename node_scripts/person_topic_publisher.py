@@ -56,7 +56,7 @@ class PersonTopicPublisher(ConnectionBasedTransport):
                 x, y, z)
             if y * (-1 if self._arm == "larm" else 1) > 0:
                 continue
-            if abs(y) > 1.0:
+            if abs(y) > 1.0 or abs(y) < 0.2:
                 continue
             if np.sqrt(x ** 2 + y ** 2) > 1.0:
                 continue

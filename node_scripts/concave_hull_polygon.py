@@ -10,6 +10,14 @@ import PyKDL
 import tf2_geometry_msgs
 import tf2_ros
 
+def flatten_list(l):
+    if isinstance(l, (tuple,list)):
+        for el in l:
+            for bar in flatten_list(el):
+                yield bar
+    else:
+        yield l
+
 class ConcaveHullPolygon(object):
 
     def __init__(self):
@@ -22,7 +30,14 @@ class ConcaveHullPolygon(object):
         self._tf_listener = tf2_ros.TransformListener(self._tf_buffer)
         self.pub = rospy.Publisher('~output', PolygonStamped, queue_size=1)
         self.subs = {}
-        self.data = {}
+        self.default_data = {}
+        for i in range(self.n_input):
+            topic_name = '~input{}'.format(i + 1)
+            topic_name = rospy.resolve_name(topic_name)
+            default_value = rospy.get_param('{}_default'.format(topic_name), [])
+            self.default_data[topic_name] = default_value
+        self.data = self.default_data
+        self.last_update = {}
         self._duration_timeout = rospy.get_param("~timeout", 6.0)
         self.frame_id = rospy.get_param('~frame_id', 'base_link')
         self.subscribe()
@@ -62,24 +77,30 @@ class ConcaveHullPolygon(object):
                     point.x, point.y, 0)
                 points.append([x, y])
         self.data[topic_name] = points
+        self.last_update[topic_name] = msg.header.stamp
 
     def timer_cb(self, timer):
-        if len(self.data) != self.n_input:
-            return
         pub_msg = PolygonStamped()
         total_points = []
+        now = rospy.Time.now()
         for i in self.data:
-            total_points.extend(self.data[i])
+            if (i in self.last_update) and (now - self.last_update[i] > rospy.Duration(2.0)):
+                total_points.extend(self.default_data[i])
+            else:
+                total_points.extend(self.data[i])
         alpha_shape = alphashape.alphashape(total_points, 2.0)
+        if alpha_shape is False:
+            return
         vertices = dump_coords(alpha_shape)
-        vertices = np.concatenate(vertices).tolist()
+        if len(vertices) <= 0:
+            return
+        vertices = list(flatten_list(vertices))
         for i in range(len(vertices)//2):
             p = Point32(x=vertices[2*i], y=vertices[2*i+1], z=0.0)
             pub_msg.polygon.points.append(p)
         pub_msg.header.frame_id = self.frame_id
         pub_msg.header.stamp = rospy.Time.now()
         self.pub.publish(pub_msg)
-
 
 if __name__ == '__main__':
     rospy.init_node('concave_hull_polygon')

@@ -137,6 +137,11 @@
                 --wait-for-start"/>
   </group>
 
+  <rosparam>
+      human_polygon_default: []
+      robot_polygon_default: [[-0.34,-0.35],[-0.34,0.35],[0.34,0.35],[0.4,0],[0.34,-0.35]]
+  </rosparam>
+
   <group ns="global_costmap" >
     <node name="concave_hull_polygon"
           pkg="teach_spot" type="concave_hull_polygon.py"
