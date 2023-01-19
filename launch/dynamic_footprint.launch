@@ -114,19 +114,25 @@
     <remap from="~input_coefficients" to="organized_multi_plane_segmentation/output_nonconnected_coefficients"/>
     <remap from="~output_polygons" to="robot_polygon"/>
     <rosparam>
-      frame_id: base_converted
+      frame_id: footprint_center
     </rosparam>
   </node>
+
+  <rosparam>
+      human_polygon_default: []
+      robot_polygon_default: [[-0.34,-0.35],[-0.34,0.35],[0.34,0.35],[0.4,0],[0.34,-0.35]]
+  </rosparam>
   
   <group ns="local_costmap" >
     <node name="concave_hull_polygon"
           pkg="teach_spot" type="concave_hull_polygon.py"
-	  output="screen" >
+	  respawn="true" output="screen" >
       <remap from="~input1" to="/human_polygon"/>
       <remap from="~input2" to="/robot_polygon"/>
       <rosparam subst_value="true">
-        frame_id: base_link
+        frame_id: base_footprint
         number_of_input: 2
+        publish_tf: true
       </rosparam>
     </node>
 
@@ -137,19 +143,14 @@
                 --wait-for-start"/>
   </group>
 
-  <rosparam>
-      human_polygon_default: []
-      robot_polygon_default: [[-0.34,-0.35],[-0.34,0.35],[0.34,0.35],[0.4,0],[0.34,-0.35]]
-  </rosparam>
-
   <group ns="global_costmap" >
     <node name="concave_hull_polygon"
           pkg="teach_spot" type="concave_hull_polygon.py"
-	  output="screen" >
+	  respawn="true" output="screen" >
       <remap from="~input1" to="/human_polygon"/>
       <remap from="~input2" to="/robot_polygon"/>
       <rosparam subst_value="true">
-        frame_id: base_converted
+        frame_id: footprint_center
         number_of_input: 2
       </rosparam>
     </node>

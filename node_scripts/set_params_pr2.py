@@ -15,12 +15,12 @@ class SetParams():
         self.mux_topics = ["/base_scan_filtered_mux", "/base_scan_filtered_mux", "/base_scan_filtered_mux",
                        "/tilt_scan_filtered_mux", "/tilt_scan_filtered_mux", "/tilt_scan_filtered_mux"]
 
-        self.footprint_params = ["/move_base_node/global_costmap/footprint_topic",
-                       "/move_base_node/local_costmap/footprint_topic",
-                       "/safe_teleop_base/local_costmap/footprint_topic"]
-        self.footprint_topics = ["/global_costmap/dynamic_footprint",
-                                 "/local_costmap/dynamic_footprint",
-                                 "/local_costmap/dynamic_footprint"]
+        self.footprint_params = ["/move_base_node/global_costmap/footprint_topic"]
+                       # "/move_base_node/local_costmap/footprint_topic",
+                       # "/safe_teleop_base/local_costmap/footprint_topic"]
+        self.footprint_topics = ["/global_costmap/dynamic_footprint"]
+                                 # "/local_costmap/dynamic_footprint",
+                                 # "/local_costmap/dynamic_footprint"]
 
         # self.set_default_params()
         rospy.on_shutdown(self.restore_params)

@@ -9,6 +9,7 @@ import numpy as np
 import PyKDL
 import tf2_geometry_msgs
 import tf2_ros
+import tf
 
 def flatten_list(l):
     if isinstance(l, (tuple,list)):
@@ -21,6 +22,7 @@ def flatten_list(l):
 class ConcaveHullPolygon(object):
 
     def __init__(self):
+        self.publish_tf = rospy.get_param('~publish_tf', False)
         self.n_input = rospy.get_param('~number_of_input', 2)
         self.n_input = int(self.n_input)
         if self.n_input <= 0:
@@ -28,6 +30,7 @@ class ConcaveHullPolygon(object):
             sys.exit(1)
 	self._tf_buffer = tf2_ros.Buffer(rospy.Duration(10))
         self._tf_listener = tf2_ros.TransformListener(self._tf_buffer)
+        self._tf_broadcaster = tf.TransformBroadcaster()
         self.pub = rospy.Publisher('~output', PolygonStamped, queue_size=1)
         self.subs = {}
         self.default_data = {}
@@ -41,7 +44,7 @@ class ConcaveHullPolygon(object):
         self._duration_timeout = rospy.get_param("~timeout", 6.0)
         self.frame_id = rospy.get_param('~frame_id', 'base_link')
         self.subscribe()
-        rate = rospy.get_param('~rate', 100)
+        rate = rospy.get_param('~rate', 200)
         if rate == 0:
             rospy.logwarn('You cannot set 0 as the rate; change it to 100.')
             rate = 100
@@ -98,6 +101,19 @@ class ConcaveHullPolygon(object):
         for i in range(len(vertices)//2):
             p = Point32(x=vertices[2*i], y=vertices[2*i+1], z=0.0)
             pub_msg.polygon.points.append(p)
+
+        if self.publish_tf:
+            max_y = 0.0
+            min_y = 0.0
+            for p in pub_msg.polygon.points:
+                max_y = max(p.y, max_y)
+                min_y = min(p.y, min_y)
+            diff = (max_y + min_y) / 2.0
+            self._tf_broadcaster.sendTransform((0, diff, 0),
+                                               (0, 0, 0, 1),
+                                               rospy.Time.now(),
+                                               'footprint_center',
+                                               self.frame_id)
         pub_msg.header.frame_id = self.frame_id
         pub_msg.header.stamp = rospy.Time.now()
         self.pub.publish(pub_msg)
